@@ -1,13 +1,1416 @@
 <!doctype html>
-<html lang="sr">
+<html lang="sr-Latn">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>LBD Boost Control Center</title>
-  <meta http-equiv="cache-control" content="no-store">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#3b2931"/>
+<title>LBD Boost Control Center</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#fbf7f8;--surface:#ffffff;--surface2:#f7f0f2;--sidebar:#3b2931;--text:#3e3036;--muted:#877780;
+  --line:#eadfe3;--accent:#b86f7e;--accent-dark:#925665;--rose:#f4e2e7;--plum:#6e5260;--sage:#708375;
+  --sage-soft:#e7eee8;--danger:#a6535d;--danger-soft:#f8e3e6;--gold:#a57a50;--gold-soft:#f7efe6;
+  --info:#7c789d;--info-soft:#eae8f3;--shadow:0 10px 32px rgba(76,45,58,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13.5px;line-height:1.55;letter-spacing:-.012em}
+button,input,select,textarea{font:inherit}
+.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,var(--sidebar),#33232b 88%);color:#fff;padding:20px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.logo-wrap{min-height:128px;display:flex;align-items:center;justify-content:center;padding:0 4px 18px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:16px}
+.logo-wrap img{max-width:240px;max-height:108px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.13))}
+.nav{display:flex;flex-direction:column;gap:5px;overflow:auto;padding-right:2px}
+.nav button{border:0;background:transparent;color:rgba(255,255,255,.72);padding:10px 12px;border-radius:12px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center;transition:.18s}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.11);color:#fff}
+.nav .dot{width:7px;height:7px;border-radius:50%;background:#d7a0ad;box-shadow:0 0 0 4px rgba(215,160,173,.09)}
+.sidebar-bottom{margin-top:auto;padding:14px 10px 2px;border-top:1px solid rgba(255,255,255,.12)}
+.sidebar-bottom small{color:rgba(255,255,255,.62);line-height:1.55}
+.main{min-width:0}
+.topbar{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.88);backdrop-filter:blur(16px);position:sticky;top:0;z-index:20}
+.title{font-size:22px;font-weight:800;letter-spacing:-.035em}
+.top-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--sage)}.status-dot.off{background:#b7aeb2}.status-dot.sync{background:#c59b52;animation:pulse 1s infinite}.status-dot.err{background:#a6535d}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.content{padding:28px;max-width:1580px;margin:0 auto}.page{display:none}.page.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.panel{padding:18px}
+.section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:28px 0 12px}
+.section-title h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.03em}.section-title p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);padding:9px 13px;border-radius:11px;cursor:pointer;transition:.15s;font-weight:700}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent-dark)}.btn.ghost{background:var(--surface2)}.btn.small{padding:7px 9px;font-size:12px}
+.table-card{overflow:auto}table{border-collapse:collapse;width:100%;min-width:980px}th{text-align:left;background:var(--surface2);color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:11px 12px;border-bottom:1px solid var(--line)}td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:10.5px;font-weight:800;white-space:nowrap}.badge.hot{color:#8d3f4d;background:#f8e3e7}.badge.warm{color:#8d633b;background:#f7ebdc}.badge.ok{color:#556c5a;background:#e8efe9}.badge.info{color:#666185;background:#eceaf3}.badge.gray{color:#7e7278;background:#f1edef}.badge.danger{color:#8f414b;background:#f8e3e6}.badge.gold{color:#87613f;background:#f8efe4}
+.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted);line-height:1.45}
+.empty{padding:26px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--text);margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:6px}label{font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.055em}
+input,select,textarea{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:11px;padding:10px 11px;outline:0}
+input:focus,select:focus,textarea:focus{border-color:#d4a3ae;box-shadow:0 0 0 3px rgba(184,111,126,.1)}textarea{min-height:130px;resize:vertical}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.form-grid .full{grid-column:1/-1}.form-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.modal-backdrop{position:fixed;inset:0;background:rgba(42,28,35,.48);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}.modal-backdrop.show{display:flex}
+.modal{background:#fff;border-radius:20px;width:min(900px,100%);max-height:92vh;overflow:auto;border:1px solid var(--line);box-shadow:0 30px 80px rgba(50,30,40,.24);padding:22px}.modal h3{margin:0 0 6px;font-size:19px}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+.recipient-list{display:grid;gap:8px;max-height:230px;overflow:auto;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface2)}.recipient-option{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);padding:9px 10px;border-radius:10px}.recipient-option input{width:auto}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--sidebar);color:#fff;padding:12px 15px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:200}.toast.show{opacity:1;transform:translateY(0)}
+/* Dashboard */
+.dashboard-hero{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 28px;margin-bottom:18px;border:1px solid #eadde2;border-radius:22px;background:linear-gradient(125deg,#fff 0%,#f9f0f3 56%,#f4e7eb 100%);box-shadow:0 14px 38px rgba(76,45,58,.07)}
+.dashboard-hero:after{content:'';position:absolute;right:-58px;top:-82px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(184,111,126,.14),rgba(184,111,126,0) 68%)}
+.dashboard-eyebrow{font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--accent-dark);margin-bottom:8px}.dashboard-hero h1{font-size:29px;line-height:1.1;letter-spacing:-.045em;margin:0 0 9px;font-weight:800}.dashboard-hero p{max-width:760px;margin:0;color:var(--muted);line-height:1.65;font-size:13px}
+.dashboard-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}.dash-kpi{position:relative;overflow:hidden;min-height:124px;padding:17px 18px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:0 8px 26px rgba(76,45,58,.055)}.dash-kpi:before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--kpi-accent,#b86f7e)}.dash-kpi-label{font-size:10.5px;color:var(--muted);font-weight:800;letter-spacing:.055em;text-transform:uppercase}.dash-kpi-value{font-size:29px;font-weight:800;letter-spacing:-.05em;margin-top:15px;line-height:1}.dash-kpi-meta{font-size:11.5px;color:var(--muted);margin-top:9px}.dash-kpi.rose{--kpi-accent:#a95e70}.dash-kpi.plum{--kpi-accent:#6f5261}.dash-kpi.sage{--kpi-accent:#657c6a}.dash-kpi.gold{--kpi-accent:#a57a50}.dash-kpi.lilac{--kpi-accent:#787397}.dash-kpi.red{--kpi-accent:#a6535d}
+.dashboard-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:16px;margin-top:16px}.dashboard-card{background:#fff;border:1px solid var(--line);border-radius:19px;box-shadow:0 8px 28px rgba(76,45,58,.055);overflow:hidden}.dashboard-card-head{padding:17px 19px 13px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.dashboard-card-head h3{margin:0;font-size:15px}.dashboard-card-head p{margin:5px 0 0;font-size:11.5px;color:var(--muted)}.dashboard-card-body{padding:16px 19px}.dashboard-card.wide{grid-column:1/-1}
+.funnel{display:grid;gap:10px}.funnel-row{display:grid;grid-template-columns:145px 1fr 34px;gap:12px;align-items:center}.funnel-label{font-size:12px;font-weight:700}.funnel-track{height:8px;background:#f2ebee;border-radius:999px;overflow:hidden}.funnel-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#c58a98,#9b6170)}.funnel-num{text-align:right;font-size:12px;font-weight:800}
+.next-list{display:grid;gap:9px}.next-item{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:#fff}.days-box{width:52px;height:48px;border-radius:12px;display:grid;place-items:center;background:var(--surface2);font-size:18px;font-weight:800;color:var(--accent-dark)}.days-box.urgent{background:var(--danger-soft);color:var(--danger)}.days-box.soon{background:var(--gold-soft);color:var(--gold)}.next-item b{display:block;font-size:12.5px;margin-bottom:3px}.next-item small{color:var(--muted)}
+.progressbar{height:8px;background:#f1eaed;border-radius:999px;overflow:hidden}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,#b86f7e,#8f5968)}
+/* Process */
+.process-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stage-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:15px;min-height:188px;position:relative}.stage-num{width:29px;height:29px;border-radius:9px;background:var(--rose);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--accent-dark);margin-bottom:10px}.stage-card h3{font-size:14px;margin:0 0 7px}.stage-card p{margin:0 0 8px;color:var(--muted);font-size:11.5px;line-height:1.55}.stage-auto{padding:8px 9px;background:#faf6f7;border-radius:10px;font-size:11px;line-height:1.45}.stage-owner{margin-top:9px;font-size:10.5px;color:var(--muted)}
+/* Timeline */
+.timeline{position:relative;display:grid;gap:10px}.timeline:before{content:'';position:absolute;left:19px;top:10px;bottom:10px;width:2px;background:#eadfe3}.timeline-item{position:relative;display:grid;grid-template-columns:42px 1fr 95px;gap:12px;align-items:start}.timeline-dot{width:14px;height:14px;border-radius:50%;background:var(--accent);margin:13px 0 0 13px;box-shadow:0 0 0 5px #f7e8ec;z-index:1}.timeline-card{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff}.timeline-card b{font-size:12.5px}.timeline-card p{margin:4px 0 0;font-size:11.5px;color:var(--muted)}.countdown{text-align:right;font-size:12px;font-weight:800;padding-top:11px}.countdown.urgent{color:var(--danger)}.countdown.soon{color:var(--gold)}
+/* Automations */
+.rule-row{display:grid;grid-template-columns:44px 54px 170px 135px 90px 150px 145px 110px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.rule-row input,.rule-row select{padding:8px;font-size:11.5px;min-width:0}.switch{width:38px;height:22px;border-radius:999px;background:#d7cdd1;position:relative;cursor:pointer}.switch:after{content:'';width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.15s;box-shadow:0 1px 4px rgba(0,0,0,.18)}.switch.on{background:var(--accent)}.switch.on:after{left:19px}
+.callout{padding:14px 16px;border:1px solid #ecd9df;background:#fff8fa;border-radius:14px;display:flex;gap:10px;align-items:flex-start}.callout b{color:var(--accent-dark)}
+@media(max-width:1150px){.dashboard-kpis{grid-template-columns:repeat(2,1fr)}.dashboard-grid{grid-template-columns:1fr}.process-flow{grid-template-columns:repeat(2,1fr)}.app{grid-template-columns:235px 1fr}}
+@media(max-width:760px){.app{display:block}.sidebar{height:auto;position:relative}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.dashboard-kpis,.form-grid,.form-grid.three,.process-flow{grid-template-columns:1fr}.content{padding:18px}.topbar{padding:0 18px}.rule-row{grid-template-columns:1fr 1fr}}
+
+/* v9 typography + wrapping refinements */
+.title,.dashboard-hero h1,.section-title h2,.dashboard-card-head h3,.stage-card h3,.modal h3{
+  font-family:'Manrope',Inter,sans-serif;
+  text-wrap:balance;
+}
+p,.tiny,.stage-card p,.stage-auto,.timeline-card p,.dashboard-card-head p{
+  overflow-wrap:anywhere;
+}
+.nav button{line-height:1.3;font-weight:600}
+.btn{white-space:nowrap}
+.table-card table{table-layout:auto}
+.table-card th,.table-card td{line-height:1.5}
+.table-card td{overflow-wrap:anywhere}
+#leads table{min-width:1420px}
+#leads th:nth-child(1),#leads td:nth-child(1){min-width:205px}
+#leads th:nth-child(2),#leads td:nth-child(2){min-width:145px}
+#leads th:nth-child(3),#leads td:nth-child(3){min-width:185px}
+#leads th:nth-child(4),#leads td:nth-child(4){min-width:260px}
+#leads th:nth-child(6),#leads td:nth-child(6){min-width:155px}
+#leads th:nth-child(7),#leads td:nth-child(7){min-width:235px}
+#clients table{min-width:1320px}
+#clients th:nth-child(1),#clients td:nth-child(1){min-width:205px}
+#clients th:nth-child(2),#clients td:nth-child(2){min-width:200px}
+#clients th:nth-child(8),#clients td:nth-child(8){min-width:240px}
+#process .process-flow{grid-template-columns:repeat(3,minmax(0,1fr))}
+.stage-card{min-height:215px;padding:17px}
+.stage-card h3{line-height:1.3}
+.stage-auto{line-height:1.55}
+
+/* Guide / instructions */
+.guide-hero{padding:24px 26px;border-radius:20px;background:linear-gradient(130deg,#fff 0%,#f8eef1 100%);border:1px solid var(--line);box-shadow:var(--shadow);margin-bottom:16px}
+.guide-hero h2{margin:0 0 8px;font-size:24px;letter-spacing:-.04em}
+.guide-hero p{margin:0;color:var(--muted);max-width:920px}
+.guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.guide-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:0 7px 24px rgba(76,45,58,.045)}
+.guide-card h3{font-size:14px;margin:0 0 8px;letter-spacing:-.02em}
+.guide-card p{font-size:11.8px;color:var(--muted);margin:0 0 8px}
+.guide-card .guide-meta{font-size:11px;line-height:1.55;padding:9px 10px;border-radius:11px;background:var(--surface2);margin-top:10px}
+.guide-step{display:flex;gap:10px;align-items:flex-start;margin:9px 0}
+.guide-step-num{flex:0 0 26px;height:26px;border-radius:8px;background:var(--rose);color:var(--accent-dark);display:grid;place-items:center;font-size:10px;font-weight:800}
+.status-flow{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.status-flow .arrow{color:#b7aab0;font-weight:800}
+.form-map{display:grid;gap:9px}
+.form-row{display:grid;grid-template-columns:155px 1fr 160px 90px;gap:12px;align-items:start;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:#fff}
+.form-row b{font-size:12px}.form-row span{font-size:11.5px;color:var(--muted)}
+.guide-note{padding:12px 14px;border-radius:13px;background:#fff8fa;border:1px solid #ecd9df;font-size:11.8px}
+@media(max-width:1150px){.guide-grid{grid-template-columns:repeat(2,1fr)}#process .process-flow{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.guide-grid,.form-row{grid-template-columns:1fr}#process .process-flow{grid-template-columns:1fr}}
+
+
+/* v10 automation center, dashboard pulse and client 360 */
+.automation-explainer{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0 18px}
+.auto-type{border:1px solid var(--line);background:#fff;border-radius:16px;padding:15px;box-shadow:0 6px 22px rgba(76,45,58,.04)}
+.auto-type .auto-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--rose);color:var(--accent-dark);font-weight:800;margin-bottom:10px}
+.auto-type h3{font-size:13px;margin:0 0 6px}.auto-type p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.55}
+.automation-note{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border-radius:14px;border:1px solid #e7dce0;background:#fff;font-size:11.8px;line-height:1.55}
+.automation-note strong{color:var(--accent-dark)}
+.automation-list{display:grid;gap:10px;margin-top:14px}
+.auto-card{display:grid;grid-template-columns:76px 1.2fr .8fr .72fr .9fr .82fr 84px;gap:10px;align-items:center;padding:13px;border:1px solid var(--line);background:#fff;border-radius:15px;box-shadow:0 5px 20px rgba(76,45,58,.035)}
+.auto-card.off{opacity:.58;background:#faf8f9}
+.auto-step{display:flex;align-items:center;gap:7px}.auto-step select{width:58px;padding:8px 6px;font-weight:800;text-align:center}
+.auto-title b{display:block;font-size:12px;line-height:1.35}.auto-title span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.auto-field label{display:block;font-size:9.5px;margin-bottom:4px}.auto-field select,.auto-field input{width:100%;padding:8px 9px;font-size:10.8px}
+.auto-controls{display:flex;align-items:center;justify-content:flex-end;gap:6px}.icon-btn{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:9px;cursor:pointer;font-weight:800;color:var(--muted)}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+.auto-mode{font-size:9.5px;font-weight:800;padding:4px 7px;border-radius:999px;display:inline-flex;margin-top:5px}
+.auto-mode.event{background:#e8efe9;color:#556c5a}.auto-mode.scheduled{background:#f7efe4;color:#87613f}.auto-mode.milestone{background:#eceaf3;color:#666185}
+.automation-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.phase-sep{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 3px 2px}
+.pulse-wrap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pulse-metric{display:grid;grid-template-columns:84px 1fr;gap:14px;align-items:center;padding:7px}
+.pulse-ring{--pct:0;width:78px;height:78px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),#eee5e8 0);display:grid;place-items:center;position:relative}
+.pulse-ring:after{content:'';position:absolute;width:58px;height:58px;background:#fff;border-radius:50%}
+.pulse-ring b{position:relative;z-index:1;font-size:15px;letter-spacing:-.03em}
+.pulse-copy b{font-size:12.5px}.pulse-copy p{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.5}
+.health-line{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.client360-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.client360-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.client360-card h4{margin:0 0 8px;font-size:12px}.client360-card p{margin:3px 0;font-size:11.5px;color:var(--muted)}
+.client360-timeline{display:grid;gap:8px}.client360-event{display:grid;grid-template-columns:100px 1fr;gap:10px;border-left:2px solid #e8d9df;padding:4px 0 4px 12px}.client360-event b{font-size:11px}.client360-event span{font-size:10.5px;color:var(--muted)}
+@media(max-width:1200px){.automation-explainer{grid-template-columns:repeat(2,1fr)}.auto-card{grid-template-columns:70px 1fr 1fr 1fr}.pulse-wrap{grid-template-columns:1fr}.client360-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.automation-explainer,.auto-card{grid-template-columns:1fr}.auto-controls{justify-content:flex-start}}
+
+
+/* v11 authorization, CRM qualification, tooltips and sync */
+.login-overlay{position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#3b2931 0%,#5f414f 48%,#efe0e5 150%);display:grid;place-items:center;padding:22px}
+.login-overlay.hidden{display:none}
+.login-card{width:min(430px,100%);background:#fff;border:1px solid rgba(255,255,255,.25);border-radius:24px;padding:26px;box-shadow:0 30px 90px rgba(25,15,20,.30)}
+.login-logo{height:78px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden}
+.login-logo img{max-height:72px;max-width:250px;object-fit:contain}
+.login-card h1{font-size:22px;margin:0 0 7px;letter-spacing:-.04em;text-align:center}
+.login-card p{font-size:12px;color:var(--muted);text-align:center;margin:0 0 20px;line-height:1.6}
+.login-card .field{margin-top:12px}
+.login-note{margin-top:14px;padding:10px 12px;border-radius:12px;background:var(--surface2);font-size:10.8px;color:var(--muted);line-height:1.55}
+.user-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff}
+.user-avatar{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:var(--rose);color:var(--accent-dark);font-size:10px;font-weight:800}
+.user-chip b{font-size:11px;display:block}.user-chip small{font-size:9.5px;color:var(--muted);display:block}
+.viewer-banner{display:none;padding:10px 14px;border:1px solid #e2dce0;background:#f7f4f5;border-radius:12px;color:var(--muted);font-size:11.5px;margin-bottom:14px}
+body.role-viewer .viewer-banner{display:block}
+body.role-viewer .admin-action{display:none!important}
+body.role-viewer .edit-control{pointer-events:none;opacity:.72}
+.qual-select{min-width:100px;font-weight:800}
+.qual-select.hot{background:#fff2f5;color:#8d3f4d;border-color:#efd3d9}
+.qual-select.warm{background:#fff8ef;color:#8d633b;border-color:#efdfc8}
+.qual-select.cold{background:#f1f3f4;color:#677078;border-color:#dde1e3}
+.qual-auto{font-size:9.5px;color:var(--muted);margin-top:4px}
+.sync-state{font-variant-numeric:tabular-nums}
+.recipient-option{grid-template-columns:auto 1fr 94px}
+.recipient-option .mail-role{width:88px;padding:6px 7px;font-size:10.5px}
+.mail-privacy{margin-top:9px;font-size:10.8px;color:var(--muted);padding:9px 10px;background:var(--surface2);border-radius:10px}
+.help-tip{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:5px;border-radius:50%;background:#efe5e9;color:var(--accent-dark);font-size:10px;font-weight:800;cursor:help;position:relative;vertical-align:middle}
+.help-tip:hover:after{content:attr(data-tip);position:absolute;z-index:200;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%);width:230px;padding:9px 10px;border-radius:10px;background:#302229;color:#fff;font-size:10.5px;font-weight:500;line-height:1.45;box-shadow:0 10px 28px rgba(0,0,0,.18);text-transform:none;letter-spacing:0}
+.help-tip:hover:before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#302229}
+.server-health{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#6f8874;display:inline-block;margin-right:5px}
+.profile-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:14px}
+.profile-edit-grid .full{grid-column:1/-1}
+.profile-edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+@media(max-width:760px){.profile-edit-grid{grid-template-columns:1fr}.recipient-option{grid-template-columns:auto 1fr}.recipient-option .mail-role{grid-column:2}}
+
+
+.qual-stack{height:14px;border-radius:999px;overflow:hidden;display:flex;background:#f0e8eb;margin:10px 0 14px}
+.qual-stack span{height:100%}
+.qual-stack .hot{background:#b85f73}.qual-stack .warm{background:#c99a65}.qual-stack .cold{background:#98a0a4}
+.qual-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.qual-legend-item{padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.qual-legend-item b{display:block;font-size:18px;letter-spacing:-.04em}.qual-legend-item span{font-size:10.5px;color:var(--muted)}
+
+
+.live-db-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:#eaf1eb;color:#536b58;font-size:10.5px;font-weight:800}
+.live-db-pill.local{background:#f7efe4;color:#87613f}
+.unsynced{font-size:10px;color:var(--gold)}
+
+
+
+/* v13 UX refinement */
+:root{--content-max:1480px;--radius:16px;--soft-shadow:0 6px 24px rgba(76,45,58,.055)}
+.content{max-width:var(--content-max);width:100%;padding:24px 26px 36px}
+.top-title-wrap{display:flex;align-items:center;gap:10px;min-width:0}.page-mode{font-size:9px;font-weight:800;letter-spacing:.08em;padding:5px 8px;border-radius:999px}.page-mode.view{background:#f1edef;color:#7b7076}.page-mode.input{background:#e8efe9;color:#556c5a}.page-mode.setup{background:#eceaf3;color:#666185}
+.sidebar-brand,.login-logo{display:flex;align-items:center;justify-content:center;gap:11px}.brand-mark{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#f4e2e7,#d8a1ad);color:#523943;font-weight:800;letter-spacing:-.05em;font-size:18px}.brand-copy{display:flex;flex-direction:column;line-height:1}.brand-copy b{font-size:18px;letter-spacing:.12em}.brand-copy span{font-size:8px;letter-spacing:.17em;opacity:.7;margin-top:5px}.sidebar-brand .brand-mark{width:46px;height:46px}.sidebar-brand .brand-copy b{color:#fff}.sidebar-brand .brand-copy span{color:rgba(255,255,255,.7)}
+.logo-wrap{min-height:105px}.login-logo{height:auto}.login-logo .brand-copy b{color:var(--text)}.login-logo .brand-copy span{color:var(--muted)}
+.nav button{min-width:0}.nav button>span:not(.dot):not(.nav-tag){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nav-tag{margin-left:auto;font-size:8px;font-weight:800;letter-spacing:.05em;padding:3px 6px;border-radius:999px}.nav-tag.input{background:rgba(139,188,151,.18);color:#c6dfcc}.nav-tag.setup{background:rgba(190,179,215,.16);color:#d8cee8}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:6px 0 18px}.page-header h2{font-size:24px;margin:4px 0 4px;letter-spacing:-.04em}.page-header p{margin:0;color:var(--muted);max-width:780px}.page-kicker{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:8px}.page-actions{display:flex;gap:8px}.data-entry-pill,.config-pill{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.08em}.data-entry-pill{background:var(--sage-soft);color:#566d5b}.config-pill{background:var(--info-soft);color:#686385}.data-entry-strip{display:flex;align-items:center;gap:10px;margin:4px 0 8px;color:var(--muted);font-size:11px}
+/* Dashboard */
+.dashboard-hero.compact{padding:22px 24px;min-height:142px}.dashboard-hero.compact h1{font-size:27px}.hero-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.dashboard-kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.dash-kpi{min-height:112px;height:112px;display:flex;flex-direction:column;justify-content:space-between}.dash-kpi-value{margin-top:8px}.dash-kpi-meta{margin-top:0}.dashboard-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:stretch}.dashboard-grid>.dashboard-card:nth-child(1),.dashboard-grid>.dashboard-card:nth-child(2),.dashboard-grid>.dashboard-card:nth-child(3){grid-column:span 4;min-height:292px}.dashboard-card.wide{grid-column:1/-1}.dashboard-card{height:100%;box-shadow:var(--soft-shadow)}.dashboard-card-body{height:calc(100% - 64px)}.next-list{max-height:220px;overflow:auto;padding-right:2px}.next-item{grid-template-columns:46px 1fr auto;padding:9px 10px}.days-box{width:46px;height:44px;font-size:16px}.funnel-row{grid-template-columns:118px 1fr 28px;gap:9px}.qual-legend{grid-template-columns:repeat(3,1fr)}.qual-legend-item{padding:9px}.qual-legend-item b{font-size:17px}
+/* Generic tables must fit canvas */
+.table-card{overflow:hidden}.table-card table{min-width:0!important;width:100%;table-layout:fixed}.table-card th,.table-card td{font-size:11px;padding:10px 8px;overflow-wrap:anywhere}.table-card th{font-size:9px}.table-card td .tiny{font-size:9.8px}.table-card select{max-width:100%;padding:7px 7px;font-size:10px}
+/* CRM */
+.qualification-guide{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:13px}.qual-guide-item{border:1px solid var(--line);border-radius:14px;padding:12px 13px;background:#fff;min-height:78px}.qual-guide-item b{display:block;font-size:11px;margin-bottom:5px}.qual-guide-item span{font-size:10.5px;line-height:1.45;color:var(--muted)}.qual-guide-item.hot{border-top:3px solid #b85f73}.qual-guide-item.warm{border-top:3px solid #c99a65}.qual-guide-item.cold{border-top:3px solid #98a0a4}.qual-guide-item.system{border-top:3px solid #777293}
+.crm-shell,.client-shell{overflow:hidden}.crm-head,.crm-row{display:grid;grid-template-columns:minmax(220px,1.7fr) minmax(135px,.9fr) minmax(150px,1fr) minmax(190px,1.3fr) 115px 155px;gap:12px;align-items:center}.crm-head,.client-head{padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--line);font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.crm-row{padding:13px 14px;border-bottom:1px solid var(--line)}.crm-row:last-child{border-bottom:0}.crm-primary{min-width:0}.crm-primary b{display:block;font-size:12px}.crm-primary .contact-line,.crm-primary .interest-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:10px;margin-top:3px}.crm-next{min-width:0}.crm-next b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}.crm-next span{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;margin-top:3px}.crm-actions{display:flex;gap:5px;justify-content:flex-end}.qual-cell{min-width:0}.qual-cell select{width:100%;padding:7px 8px;font-size:10px}.override-flag{display:inline-flex;margin-top:5px;font-size:8.5px;font-weight:800;padding:3px 6px;border-radius:999px}.override-flag.auto{background:#f1edef;color:#766d72}.override-flag.manual{background:#eceaf3;color:#656080}.qual-system{font-size:9px;color:var(--muted);margin-bottom:4px}.follow-date{font-size:11px;font-weight:700}.follow-date small{display:block;font-size:9px;color:var(--muted);margin-top:3px}
+/* Clients */
+.status-legend{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:13px;padding:11px 13px;background:#fff;border:1px solid var(--line);border-radius:14px}.status-legend>div{display:flex;align-items:center;gap:3px}.client-head,.client-row{display:grid;grid-template-columns:minmax(200px,1.5fr) minmax(180px,1.35fr) minmax(160px,1.1fr) 165px minmax(180px,1.2fr) 150px;gap:12px;align-items:center}.client-row{padding:13px 14px;border-bottom:1px solid var(--line)}.client-row:last-child{border-bottom:0}.client-cell-primary b{display:block;font-size:12px}.client-cell-primary span,.client-program span,.client-period span{display:block;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}.client-actions{display:flex;gap:5px;justify-content:flex-end}.status-control{display:flex;align-items:center;gap:5px}.status-control select{min-width:0;width:130px;padding:7px 8px;font-size:10px}
+/* Calendar */
+.calendar-source-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.source-card{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.source-icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--surface2);font-size:9px;font-weight:800;color:var(--accent-dark)}.source-card b{font-size:11px}.source-card p{margin:3px 0 0;font-size:9.8px;color:var(--muted);line-height:1.35}.timeline-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}.source-badge{font-size:8.5px;font-weight:800;padding:3px 6px;border-radius:999px;background:#f1edef;color:#766d72;margin-left:6px}.source-badge.auto{background:#e8efe9;color:#586f5d}.timeline-card p{margin:4px 0}.timeline-item{grid-template-columns:20px 1fr 95px}
+/* Email */
+.email-layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:14px;align-items:start}.email-main{padding:18px}.composer-step{display:flex;align-items:center;gap:10px;padding:7px 0 11px;margin-top:4px;border-bottom:1px solid var(--line);margin-bottom:12px}.composer-step:not(:first-child){margin-top:18px}.composer-step>span{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--rose);color:var(--accent-dark);font-weight:800;font-size:10px}.composer-step b{display:block;font-size:12px}.composer-step small{display:block;color:var(--muted);font-size:9.5px;margin-top:2px}.compact-fields{gap:10px}.mail-body{min-height:230px;line-height:1.6}.input-with-action{display:grid;grid-template-columns:1fr auto;gap:7px}.email-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}.email-help{position:sticky;top:92px}.email-help h3{font-size:13px;margin:0 0 12px}.email-help-row{padding:10px 0;border-bottom:1px solid var(--line)}.email-help-row:last-child{border-bottom:0}.email-help-row b{display:block;font-size:10px}.email-help-row span{display:block;color:var(--muted);font-size:9.8px;line-height:1.45;margin-top:3px}
+/* Settings */
+.settings-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.settings-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}.settings-card-head h3{margin:0;font-size:14px}.settings-card-head p{margin:4px 0 0;color:var(--muted);font-size:10.5px}.connection-diagram{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px;background:var(--surface2);border-radius:12px;font-size:10px;font-weight:700}.connection-diagram span{background:#fff;border:1px solid var(--line);padding:7px 9px;border-radius:9px}.settings-explain{font-size:10.8px;color:var(--muted);line-height:1.55}.settings-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.connection-meta{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}.advanced-settings{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.advanced-settings summary{cursor:pointer;font-size:10.5px;font-weight:800;color:var(--muted);margin-bottom:10px}.access-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.access-card{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}.access-card>span{font-size:9px;font-weight:800;padding:4px 7px;border-radius:999px}.access-card.admin>span{background:var(--sage-soft);color:#556c5a}.access-card.viewer>span{background:#f1edef;color:#7e7278}.access-card h3{margin:9px 0 5px;font-size:13px}.access-card p{margin:0;font-size:10.5px;color:var(--muted);line-height:1.5}
+/* Help tooltip on top of overlays */
+.help-tip:hover:after{width:245px;max-width:70vw}
+@media(max-width:1250px){.dashboard-grid>.dashboard-card:nth-child(1),.dashboard-grid>.dashboard-card:nth-child(2){grid-column:span 6}.dashboard-grid>.dashboard-card:nth-child(3){grid-column:1/-1}.crm-head,.crm-row{grid-template-columns:minmax(200px,1.5fr) 130px 145px minmax(170px,1.2fr) 105px 130px}.client-head,.client-row{grid-template-columns:minmax(190px,1.4fr) minmax(170px,1.2fr) 150px 155px minmax(160px,1fr) 130px}.qualification-guide{grid-template-columns:repeat(2,1fr)}.calendar-source-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1020px){.app{grid-template-columns:230px 1fr}.content{padding:20px}.dashboard-kpis{grid-template-columns:repeat(2,1fr)}.crm-head,.client-head{display:none}.crm-row,.client-row{grid-template-columns:1fr 1fr}.crm-actions,.client-actions{justify-content:flex-start}.email-layout,.settings-grid{grid-template-columns:1fr}.email-help{position:static}.calendar-source-grid{grid-template-columns:1fr 1fr}.dashboard-grid>.dashboard-card:nth-child(-n+3){grid-column:1/-1}.topbar{padding:0 20px}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;height:auto}.nav{display:grid;grid-template-columns:1fr 1fr}.main{width:100%}.topbar{height:auto;min-height:70px;padding:12px 16px;align-items:flex-start;gap:10px}.top-actions{justify-content:flex-end}.content{padding:16px}.page-header{align-items:flex-start;flex-direction:column}.qualification-guide,.calendar-source-grid,.access-grid{grid-template-columns:1fr}.crm-row,.client-row{grid-template-columns:1fr}.dashboard-kpis{grid-template-columns:1fr 1fr}.hero-actions{justify-content:flex-start}.dashboard-hero{align-items:flex-start;flex-direction:column}.email-actions{justify-content:flex-start;flex-wrap:wrap}.form-grid.three,.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}}
+</style>
 </head>
 <body>
-  <script>location.replace('/api/app');</script>
-  <noscript><a href="/api/app">Otvori LBD Boost Control Center</a></noscript>
+
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-card">
+    <div class="login-logo"><div class="brand-mark">LBD</div><div class="brand-copy"><b>BOOST</b><span>CONTROL CENTER</span></div></div>
+    <h1>LBD Boost Control Center</h1>
+    <p>Prijavite se korisničkim imenom. Nivo pristupa određuje da li korisnik samo pregleda podatke ili može da ih menja.</p>
+    <div class="field"><label>Korisničko ime</label><input id="loginUsername" autocomplete="username" placeholder="admin ili viewer"/></div>
+    <div class="field"><label>PIN / lozinka</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Pilot: opciono"/></div>
+    <button class="btn primary" style="width:100%;margin-top:16px" onclick="loginUser()">Prijavi se</button>
+    <div id="loginError" class="login-note">Pilot podržava dva nivoa: <b>ADMIN</b> može sve da menja, <b>VIEWER</b> može samo da pregleda. Za produkciju preporuka je Google / magic-link autentifikacija.</div>
+  </div>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="logo-wrap"><div class="sidebar-brand"><div class="brand-mark">LBD</div><div class="brand-copy"><b>BOOST</b><span>CONTROL CENTER</span></div></div></div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="dashboard"><span class="dot"></span>Dashboard</button>
+    <button data-page="leads"><span class="dot"></span><span>CRM / Leadovi</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="clients"><span class="dot"></span><span>Klijenti</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="enrollments"><span class="dot"></span><span>Upisi na program</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="payments"><span class="dot"></span><span>Uplate</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="groups"><span class="dot"></span><span>Grupe</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="calendar"><span class="dot"></span><span>Kalendar i podsetnici</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="process"><span class="dot"></span>Tok procesa</button>
+    <button data-page="emailCenter"><span class="dot"></span><span>Email centar</span><span class="nav-tag input">UNOS</span></button>
+    <button data-page="automations"><span class="dot"></span><span>Automatizacije</span><span class="nav-tag setup">PODEŠ.</span></button>
+    <button data-page="guide"><span class="dot"></span>Uputstvo</button>
+    <button data-page="settings"><span class="dot"></span><span>Podešavanja</span><span class="nav-tag setup">PODEŠ.</span></button>
+  </nav>
+  <div class="sidebar-bottom"><small><b>LBD Boost Control Center</b><br/>Control Center • Google Sheets baza • sync na 5 sekundi kada je backend povezan</small></div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <div class="top-title-wrap"><div class="title" id="pageTitle">Dashboard</div><span id="pageModeBadge" class="page-mode view">PREGLED</span></div>
+  <div class="top-actions">
+    <span class="chip"><span id="driveDot" class="status-dot off"></span><span id="driveStatusText" class="sync-state">Drive: nije povezan</span></span>
+    <div id="currentUserChip" class="user-chip"><div class="user-avatar" id="userAvatar">—</div><div><b id="userNameText">Nije prijavljen</b><small id="userRoleText">—</small></div></div>
+    <button class="btn" onclick="goPage('emailCenter')">Email za proveru <span id="emailCountBadge" class="badge warm">0</span></button>
+    <button class="btn small" onclick="logoutUser()">Odjava</button>
+  </div>
+</header>
+<div class="content">
+<div class="viewer-banner">Prijavljeni ste sa VIEWER pristupom. Možete pregledati sve podatke, ali izmene, email slanje i automatizacije su zaključani.</div>
+
+<section id="dashboard" class="page active">
+  <div class="dashboard-hero compact">
+    <div>
+      <div class="dashboard-eyebrow">LBD Boost • Operativni centar</div>
+      <h1>Pregled poslovanja na jednom mestu</h1>
+      <p>Prioriteti za danas, stanje prodaje, naplate, kapaciteta i sledeći koraci — bez ulaska u pojedinačne module.</p>
+    </div>
+    <div class="hero-actions">
+      <button class="admin-action btn primary" onclick="openLeadModal()">+ Novi lead</button>
+      <button class="admin-action btn" onclick="openClientModal()">+ Upis klijenta</button>
+      <button class="btn ghost" onclick="goPage('guide')">Kako se koristi</button>
+    </div>
+  </div>
+  <div id="dashboardKpis" class="dashboard-kpis"></div>
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <div class="dashboard-card-head"><div><h3>Prodajni funnel</h3><p>Od prvog kontakta do potvrđenog upisa.</p></div></div>
+      <div class="dashboard-card-body"><div id="funnel" class="funnel"></div></div>
+    </div>
+    <div class="dashboard-card">
+      <div class="dashboard-card-head"><div><h3>CRM kvalifikacija</h3><p>Raspodela leadova prema prodajnom prioritetu HOT / WARM / COLD.</p></div><button class="btn small" onclick="goPage('leads')">CRM</button></div>
+      <div class="dashboard-card-body">
+        <div id="qualificationSummary"></div>
+      </div>
+    </div>
+    <div class="dashboard-card">
+      <div class="dashboard-card-head"><div><h3>Sledeći koraci</h3><p>Najbliži rokovi i radnje iz kalendara i CRM-a.</p></div><button class="btn small" onclick="goPage('calendar')">Kalendar</button></div>
+      <div class="dashboard-card-body"><div id="nextSteps" class="next-list"></div></div>
+    </div>
+    <div class="dashboard-card wide">
+      <div class="dashboard-card-head"><div><h3>Operativni puls</h3><p>Tri pokazatelja koja brzo govore da li prodaja, naplata i kapacitet rade kako treba.</p></div><button class="btn small" onclick="goPage('automations')">Automatizacije</button></div>
+      <div class="dashboard-card-body">
+        <div id="operationalPulse" class="pulse-wrap"></div>
+        <div id="automationHealth" class="health-line"></div>
+      </div>
+    </div>
+<div class="dashboard-card wide">
+      <div class="dashboard-card-head"><div><h3>Kapacitet grupa</h3><p>Popunjenost, program i prihod po grupi.</p></div><button class="btn small" onclick="goPage('groups')">Sve grupe</button></div>
+      <div class="dashboard-card-body" id="groupCapacity"></div>
+    </div>
+  </div>
+</section>
+
+<section id="leads" class="page">
+  <div class="page-header">
+    <div><div class="page-kicker"><span class="data-entry-pill">UNOS PODATAKA</span> Prodaja</div><h2>CRM / Leadovi</h2><p>Ovde vodiš svaki kontakt od prvog interesovanja do upisa. Najvažnije su kvalifikacija, status i sledeći follow-up.</p></div>
+    <div class="page-actions"><button class="admin-action btn" onclick="openBulkComposer('HOT')">Email za HOT</button><button class="admin-action btn primary" onclick="openLeadModal()">+ Novi lead</button></div>
+  </div>
+  <div class="qualification-guide">
+    <div class="qual-guide-item hot"><b>HOT</b><span>Visok prioritet. Spremna je za sledeći prodajni korak.</span></div>
+    <div class="qual-guide-item warm"><b>WARM</b><span>Zainteresovana je, ali joj treba dodatna informacija ili follow-up.</span></div>
+    <div class="qual-guide-item cold"><b>COLD</b><span>Trenutno nizak prioritet. Ostaje u nurture komunikaciji.</span></div>
+    <div class="qual-guide-item system"><b>Kako radi kvalifikacija?</b><span>Sistem predlaže HOT/WARM/COLD prema score-u. ADMIN može ručno da promeni predlog; tada se prikazuje oznaka „Ručno“.</span></div>
+  </div>
+  <div class="crm-shell card">
+    <div class="crm-head"><span>Kontakt / interesovanje</span><span>Kvalifikacija</span><span>Status</span><span>Sledeći korak</span><span>Follow-up</span><span>Akcije</span></div>
+    <div id="leadRows" class="crm-list"></div>
+    <div id="leadEmpty" class="empty">Nema leadova.</div>
+  </div>
+</section>
+
+<section id="clients" class="page">
+  <div class="page-header">
+    <div><div class="page-kicker"><span class="data-entry-pill">UNOS PODATAKA</span> Isporuka programa</div><h2>Klijenti</h2><p>Pregled osoba koje su upisane ili prolaze kroz program, sa jasnim statusom i sledećim korakom.</p></div>
+    <button class="admin-action btn primary" onclick="openClientModal()">+ Upis klijenta</button>
+  </div>
+  <div class="status-legend">
+    <div><span class="badge ok">UPISANA</span><span class="help-tip" data-tip="Uplata / rezervacija mesta je potvrđena. Sledeći korak je onboarding.">?</span></div>
+    <div><span class="badge warm">ONBOARDING</span><span class="help-tip" data-tip="Klijent je upisan, ali dokumentacija, forma ili logistika još nisu završeni.">?</span></div>
+    <div><span class="badge ok">AKTIVNA</span><span class="help-tip" data-tip="Program je u toku. Prate se progress check, iskustvo i naredni milestone-i.">?</span></div>
+    <div><span class="badge info">RENEWAL</span><span class="help-tip" data-tip="Klijent je u periodu odluke o nastavku / sledećem nivou, najčešće 30 dana pre kraja.">?</span></div>
+    <div><span class="badge gray">ZAVRŠILA</span><span class="help-tip" data-tip="Program je završen. Slede testimonial, preporuka ili alumni nurture.">?</span></div>
+    <div><span class="badge gold">PAUZIRANA</span><span class="help-tip" data-tip="Klijent privremeno ne učestvuje; razlog i plan nastavka treba evidentirati u profilu.">?</span></div>
+  </div>
+  <div class="client-shell card">
+    <div class="client-head"><span>Klijent</span><span>Program / grupa</span><span>Period / vrednost</span><span>Status</span><span>Sledeći korak</span><span>Akcije</span></div>
+    <div id="clientRows" class="client-list"></div>
+  </div>
+</section>
+
+<section id="enrollments" class="page">
+  <div class="data-entry-strip"><span class="data-entry-pill">UNOS PODATAKA</span><span>Podaci uneseni ovde odmah se čuvaju u centralnoj Google Sheet bazi.</span></div>
+  <div class="section-title"><div><h2>Upisi na program</h2><p>Klijent može biti dodat ručno ili iz CRM baze; program, datum i cena se automatski popunjavaju iz kataloga.</p></div><button class="admin-action btn primary" onclick="openClientModal()">+ Novi upis</button></div>
+  <div class="card table-card"><table>
+    <thead><tr><th>Klijent</th><th>Program</th><th>Grupa</th><th>Datum upisa</th><th>Početak</th><th>Kraj</th><th>Plan plaćanja</th><th>Status</th></tr></thead>
+    <tbody id="enrollmentRows"></tbody>
+  </table></div>
+</section>
+
+<section id="payments" class="page">
+  <div class="data-entry-strip"><span class="data-entry-pill">UNOS PODATAKA</span><span>Podaci uneseni ovde odmah se čuvaju u centralnoj Google Sheet bazi.</span></div>
+  <div class="section-title"><div><h2>Uplate</h2><p>Rate, rokovi, kašnjenja i automatski reminder-i.</p></div><button class="admin-action btn primary" onclick="openPaymentModal()">+ Nova uplata</button></div>
+  <div class="card table-card"><table>
+    <thead><tr><th>Klijent</th><th>Rata</th><th>Iznos</th><th>Rok</th><th>Preostalo</th><th>Status</th><th>Datum uplate</th></tr></thead>
+    <tbody id="paymentRows"></tbody>
+  </table></div>
+</section>
+
+<section id="groups" class="page">
+  <div class="data-entry-strip"><span class="data-entry-pill">UNOS PODATAKA</span><span>Podaci uneseni ovde odmah se čuvaju u centralnoj Google Sheet bazi.</span></div>
+  <div class="section-title"><div><h2>Grupe</h2><p>Kapacitet, program, period, raspored i prihod.</p></div><button class="admin-action btn primary" onclick="openGroupModal()">+ Nova grupa</button></div>
+  <div class="card table-card"><table>
+    <thead><tr><th>Grupa</th><th>Program</th><th>Format</th><th>Period</th><th>Raspored</th><th>Kapacitet</th><th>Upisano</th><th>Popunjenost</th><th>Prihod</th></tr></thead>
+    <tbody id="groupRows"></tbody>
+  </table></div>
+</section>
+
+<section id="calendar" class="page">
+  <div class="page-header">
+    <div><div class="page-kicker"><span class="data-entry-pill">UNOS + AUTO</span> Rokovi</div><h2>Kalendar i podsetnici</h2><p>Kalendar kombinuje automatske rokove iz CRM-a, uplata i programa sa događajima koje ručno dodaješ.</p></div>
+    <button class="admin-action btn primary" onclick="openCalendarModal()">+ Ručni događaj</button>
+  </div>
+  <div class="calendar-source-grid">
+    <div class="source-card"><span class="source-icon">CRM</span><div><b>CRM follow-up</b><p>Datum „Sledeći follow-up“ sa leada.</p></div></div>
+    <div class="source-card"><span class="source-icon">€</span><div><b>Uplate</b><p>Rokovi neplaćenih rata iz modula Uplate.</p></div></div>
+    <div class="source-card"><span class="source-icon">PRG</span><div><b>Program / grupe</b><p>Početak, kraj i renewal rokovi.</p></div></div>
+    <div class="source-card"><span class="source-icon">+</span><div><b>Ručni događaj</b><p>Webinar, Zoom, kampanja ili drugi interni rok.</p></div></div>
+  </div>
+  <div class="card panel"><div class="timeline-toolbar"><b>Svi naredni koraci</b><span class="tiny">Izvor događaja je označen na svakoj stavci.</span></div><div id="timeline" class="timeline"></div></div>
+</section>
+
+<section id="process" class="page">
+  <div class="section-title"><div><h2>Tok celokupnog procesa</h2><p>Marketing → CRM → prodaja → uplata → onboarding → program → progress → renewal → loyalty.</p></div></div>
+  <div id="processFlow" class="process-flow"></div>
+</section>
+
+<section id="emailCenter" class="page">
+  <div class="page-header">
+    <div><div class="page-kicker"><span class="data-entry-pill">UNOS PODATAKA</span> Komunikacija</div><h2>Email centar</h2><p>Izaberi primaoce, prilagodi poruku i tek onda otvori Gmail draft. Telo emaila je potpuno izmenjivo.</p></div>
+  </div>
+  <div class="email-layout">
+    <div class="card panel email-main">
+      <div class="composer-step"><span>1</span><div><b>Primaoci</b><small>Segment i način slanja</small></div></div>
+      <div class="form-grid three compact-fields">
+        <div class="field"><label>Segment <span class="help-tip" data-tip="Grupa kontakata kojoj želiš da pošalješ poruku, npr. HOT leadovi ili aktivni klijenti.">?</span></label><select id="mailSegment" onchange="refreshComposerRecipients()"></select></div>
+        <div class="field"><label>Template <span class="help-tip" data-tip="Polazni tekst poruke. Posle izbora možeš slobodno da menjaš naslov i telo emaila.">?</span></label><select id="mailTemplateSelect" onchange="loadSelectedTemplate()"></select></div>
+        <div class="field"><label>Način slanja <span class="help-tip" data-tip="TO je glavni primalac; CC je vidljiva kopija; BCC skriva adrese drugih primalaca.">?</span></label><select id="mailMode" onchange="refreshComposerRecipients()"><option value="all_bcc">Svi u BCC</option><option value="all_to">Svi u TO</option><option value="all_cc">Svi u CC</option><option value="first_to_rest_bcc">Prvi u TO + ostali BCC</option><option value="first_to_rest_cc">Prvi u TO + ostali CC</option><option value="custom">Prilagođeno po kontaktu</option></select></div>
+        <div class="field full"><label>Primaoci</label><div id="mailRecipients" class="recipient-list"></div><div id="mailPrivacyNote" class="mail-privacy"></div></div>
+      </div>
+      <div class="composer-step"><span>2</span><div><b>Poruka</b><small>Naslov i telo se mogu menjati pre svakog slanja</small></div></div>
+      <div class="form-grid">
+        <div class="field full"><label>Naslov emaila</label><input id="mailSubject"/></div>
+        <div class="field full"><label>Telo emaila <span class="help-tip" data-tip="Ovo je stvarni tekst koji primalac dobija. Možeš ga menjati bez promene originalnog template-a, osim ako klikneš Sačuvaj template.">?</span></label><textarea id="mailBody" class="mail-body"></textarea></div>
+      </div>
+      <div class="composer-step"><span>3</span><div><b>Dodatno</b><small>Opciono — CTA link i interna napomena</small></div></div>
+      <div class="form-grid">
+        <div class="field"><label>CTA link / forma <span class="help-tip" data-tip="Opcion link koji vodi na onboarding formu, webinar prijavu, renewal formu ili drugi sledeći korak. Možeš ga ubaciti u telo poruke.">?</span></label><div class="input-with-action"><input id="mailLink" placeholder="https://..."/><button class="btn small" type="button" onclick="insertMailLink()">Ubaci u tekst</button></div></div>
+        <div class="field"><label>Interna napomena <span class="help-tip" data-tip="Napomena je samo za tim i NE šalje se primaocu. Koristi je za kontekst, npr. 'proveriti termin pre slanja'.">?</span></label><input id="mailNote" placeholder="Ne šalje se primaocu"/></div>
+      </div>
+      <div class="email-actions"><button class="admin-action btn" onclick="saveTemplateChanges()">Sačuvaj template</button><button class="admin-action btn" onclick="queueCurrentEmail()">Sačuvaj za proveru</button><button class="admin-action btn primary" onclick="openCurrentGmail()">Otvori Gmail draft</button></div>
+    </div>
+    <aside class="card panel email-help"><h3>Kako koristiti Email centar</h3><div class="email-help-row"><b>TO</b><span>Direktan primalac. Koristi za individualnu poruku.</span></div><div class="email-help-row"><b>CC</b><span>Vidljiva kopija — svi vide adrese.</span></div><div class="email-help-row"><b>BCC</b><span>Za grupno slanje kada primaoci ne treba da vide tuđe adrese.</span></div><div class="email-help-row"><b>Link / forma</b><span>Opcion sledeći korak. Ne menja telo poruke dok ga ne ubaciš ili pošalješ.</span></div><div class="email-help-row"><b>Napomena</b><span>Interna beleška. Nikada se ne dodaje u email.</span></div></aside>
+  </div>
+  <div class="section-title"><div><h2>Email queue</h2><p>Poruke koje čekaju finalnu proveru ili su označene kao poslate.</p></div></div>
+  <div id="emailQueueList" class="card panel"></div>
+</section>
+
+<section id="automations" class="page">
+  <div class="section-title"><div><h2>Automatizacioni centar</h2><p>Jedinstven redosled pravila bez duplih pozicija. Promena pozicije automatski zamenjuje dva koraka.</p></div><div><button class="admin-action btn" onclick="install24x7Automation()">Uključi 24/7 proveru</button> <button class="admin-action btn" onclick="resetAutomationOrder()">Vrati preporučeni redosled</button></div></div>
+
+  <div class="automation-explainer">
+    <div class="auto-type"><div class="auto-icon">01</div><h3>EVENT — odmah nakon promene</h3><p>Pokreće se kada se desi konkretan događaj: novi lead, HOT status, upis ili završen onboarding.</p></div>
+    <div class="auto-type"><div class="auto-icon">02</div><h3>SCHEDULED — proverava rokove</h3><p>Za webinar, uplate, Zoom i renewal. Pilot proverava dok je aplikacija otvorena; produkcioni backend će raditi 24/7.</p></div>
+    <div class="auto-type"><div class="auto-icon">03</div><h3>MILESTONE — prati program</h3><p>Aktivira 30/60/90 progress check, završetak programa i druge događaje vezane za trajanje ciklusa.</p></div>
+    <div class="auto-type"><div class="auto-icon">04</div><h3>REVIEW — vlasnica potvrđuje</h3><p>Sistem pripremi email i primaoce, ali HOT, prodajni i renewal email ne idu bez finalne provere.</p></div>
+  </div>
+
+  <div class="automation-note">
+    <div>✦</div>
+    <div><strong>Šta znači „stalna automatizacija“?</strong> Ne znači da aplikacija svakih nekoliko sekundi šalje poruke. Sistem stalno proverava da li je nastupio <b>trigger</b> ili rok. Kada jeste, izvršava sledeću definisanu akciju. Ako je uključena finalna provera, akcija staje u <b>Email za proveru</b> dok je vlasnica ne potvrdi. Kada aplikaciju postavimo kao Google Apps Script Web App i uključimo scheduler, proveravanje rokova radi 24/7 i kada browser nije otvoren. Akcije koje traže proveru samo se dodaju u Email queue.</div>
+  </div>
+
+  <div class="automation-legend">
+    <span class="badge ok">EVENT</span><span class="tiny">status / događaj</span>
+    <span class="badge gold">SCHEDULED</span><span class="tiny">datum / rok</span>
+    <span class="badge info">MILESTONE</span><span class="tiny">30/60/90 / kraj programa</span>
+  </div>
+
+  <div class="card panel" style="margin-top:14px">
+    <div id="automationRows" class="automation-list"></div>
+  </div>
+</section>
+
+<section id="guide" class="page">
+  <div class="guide-hero">
+    <div class="dashboard-eyebrow">LBD Boost • Uputstvo</div>
+    <h2>Gde se šta prati i kada treba reagovati</h2>
+    <p>Ova strana je operativna mapa alata. Pokazuje gde se vodi prodaja, gde se prati sledeći follow-up, kada lead prelazi u narednu fazu, koja forma pripada kojoj fazi i šta je automatizovano, a šta zahteva finalnu proveru vlasnice.</p>
+  </div>
+
+  <div class="section-title"><div><h2>1. Brza mapa alata</h2><p>Najvažnije sekcije i šta se u njima radi.</p></div></div>
+  <div class="guide-grid">
+    <div class="guide-card"><h3>Dashboard</h3><p>Jutarnji operativni pregled. Ovde se ne unose podaci ručno.</p><div class="guide-meta"><b>Prati:</b> HOT leadove, WARM/COLD raspodelu, aktivne klijente, prihod, email queue, grupe i najbliže rokove.<br/><b>Reaguj:</b> prvo na crvene i žute signale.</div></div>
+    <div class="guide-card"><h3>CRM / Leadovi</h3><p>Glavna prodajna baza za sve osobe koje su pokazale interesovanje.</p><div class="guide-meta"><b>Unosi:</b> kontakt, izvor, kampanju, cilj, izazov, program, termin, spremnost, status i follow-up.<br/><b>Sistem:</b> računa score i predlaže HOT/WARM/COLD. ADMIN može ručno da promeni kvalifikaciju, a AUTO vraća sistemski predlog.</div></div>
+    <div class="guide-card"><h3>Klijenti</h3><p>Osobe koje su ušle u program ili su već aktivne.</p><div class="guide-meta"><b>Prati:</b> program, grupu, period, status, onboarding, sledeći korak i renewal.<br/><b>Klijent nastaje:</b> ručno ili konverzijom iz CRM-a.</div></div>
+    <div class="guide-card"><h3>Upisi na program</h3><p>Istorija veza klijent → program → grupa.</p><div class="guide-meta"><b>Prati:</b> datum upisa, početak, kraj, cenu i plan plaćanja.<br/><b>Koristi:</b> kada isti klijent kasnije prelazi na Level 2 ili membership.</div></div>
+    <div class="guide-card"><h3>Kalendar i podsetnici</h3><p>Centralno mesto za sve vremenske okidače.</p><div class="guide-meta"><b>Prati:</b> webinar, rokove uplata, logistiku, početak programa, Zoom i renewal.<br/><b>Dashboard:</b> automatski prikazuje koliko dana je ostalo.</div></div>
+    <div class="guide-card"><h3>Email centar</h3><p>Finalna provera komunikacije pre slanja.</p><div class="guide-meta"><b>Možeš menjati:</b> segment, BCC primaoce, subject, telo emaila i link forme.<br/><b>Prodajni mailovi:</b> ostaju review-before-send.</div></div>
+    <div class="guide-card"><h3>Automatizacije</h3><p>Ovde se menja sama procedura bez menjanja koda.</p><div class="guide-meta"><b>Menjaš:</b> redosled, trigger, delay, template, trenutak slanja forme i da li je potrebna ručna provera.</div></div>
+    <div class="guide-card"><h3>Uplate</h3><p>Rate, rokovi i kašnjenja.</p><div class="guide-meta"><b>Prati:</b> iznos, rok, status i datum uplate.<br/><b>Reminder:</b> D-5 / D-3 / D-1 prema pravilu.</div></div>
+    <div class="guide-card"><h3>Grupe</h3><p>Kapacitet i popunjenost programa.</p><div class="guide-meta"><b>Prati:</b> program, format, raspored, kapacitet, broj upisanih i prihod grupe.</div></div>
+  </div>
+
+  <div class="section-title"><div><h2>2. CRM statusi i sledeća faza</h2><p>Kako osoba ide od prvog interesovanja do završetka programa.</p></div></div>
+  <div class="card panel">
+    <div class="status-flow">
+      <span class="badge gray">WAITING LIST</span><span class="arrow">→</span>
+      <span class="badge info">KVALIFIKOVANA</span><span class="arrow">→</span>
+      <span class="badge info">PONUDA POSLATA</span><span class="arrow">→</span>
+      <span class="badge hot">ČEKA UPLATU</span><span class="arrow">→</span>
+      <span class="badge ok">UPISANA</span><span class="arrow">→</span>
+      <span class="badge warm">ONBOARDING</span><span class="arrow">→</span>
+      <span class="badge ok">AKTIVNA</span><span class="arrow">→</span>
+      <span class="badge info">RENEWAL</span><span class="arrow">→</span>
+      <span class="badge ok">ZAVRŠILA</span>
+    </div>
+    <div class="guide-grid" style="margin-top:16px">
+      <div class="guide-card"><h3>WAITING LIST</h3><p>Osoba je ostavila interesovanje.</p><div class="guide-meta"><b>Sledeće:</b> webinar / nurture / kvalifikacija.<br/><b>Follow-up:</b> prema kampanji.</div></div>
+      <div class="guide-card"><h3>KVALIFIKOVANA</h3><p>Program, cena i interesovanje imaju smisla.</p><div class="guide-meta"><b>Sledeće:</b> lični follow-up / sample trening / ponuda.<br/><b>HOT:</b> odgovoriti u 24h.</div></div>
+      <div class="guide-card"><h3>PONUDA POSLATA</h3><p>Klijent ima konkretnu ponudu.</p><div class="guide-meta"><b>Sledeće:</b> proveriti odluku i raspoloživost mesta.</div></div>
+      <div class="guide-card"><h3>ČEKA UPLATU</h3><p>Mesto još nije potvrđeno.</p><div class="guide-meta"><b>Sledeće:</b> instrukcije + D-3 / D-1 reminder.</div></div>
+      <div class="guide-card"><h3>UPISANA</h3><p>Uplata je potvrđena / mesto rezervisano.</p><div class="guide-meta"><b>Sledeće:</b> onboarding forma i dokumentacija.</div></div>
+      <div class="guide-card"><h3>ONBOARDING</h3><p>Dokumentacija još nije kompletna.</p><div class="guide-meta"><b>Sledeće:</b> ugovor, saglasnost, upitnici, logistika.</div></div>
+      <div class="guide-card"><h3>AKTIVNA</h3><p>Program je u toku.</p><div class="guide-meta"><b>Sledeće:</b> 30/60/90 progress, prisustvo i iskustvo.</div></div>
+      <div class="guide-card"><h3>RENEWAL</h3><p>Klijent ulazi u period odluke o nastavku.</p><div class="guide-meta"><b>Sledeće:</b> ponuda sledećeg nivoa 30 dana pre kraja.</div></div>
+      <div class="guide-card"><h3>ZAVRŠILA / NURTURE</h3><p>Završen ciklus ili trenutno nije spremna za novi.</p><div class="guide-meta"><b>Sledeće:</b> testimonial, referral ili sledeća kampanja.</div></div>
+    </div>
+  </div>
+
+  <div class="section-title"><div><h2>3. Gde se prati follow-up</h2><p>Jedinstveno pravilo da nijedan lead ili klijent ne ispadne iz procesa.</p></div></div>
+  <div class="card panel">
+    <div class="guide-step"><div class="guide-step-num">1</div><div><b>CRM / Leadovi → Sledeći korak</b><div class="tiny">Opis konkretne akcije: npr. „Poziv na webinar“, „Poslati sample trening“, „Instrukcije za uplatu“.</div></div></div>
+    <div class="guide-step"><div class="guide-step-num">2</div><div><b>CRM / Leadovi → Sledeći follow-up</b><div class="tiny">Datum kada akcija mora da se desi. Sistem računa koliko dana je ostalo i prikazuje ga i na Dashboardu.</div></div></div>
+    <div class="guide-step"><div class="guide-step-num">3</div><div><b>Kalendar i podsetnici</b><div class="tiny">Za zajedničke rokove: webinar, uplata, logistika, Zoom, početak i kraj programa.</div></div></div>
+    <div class="guide-step"><div class="guide-step-num">4</div><div><b>Dashboard → Sledeći koraci</b><div class="tiny">Kombinuje individualne follow-up datume i zajedničke događaje i sortira ih po hitnosti.</div></div></div>
+  </div>
+
+  <div class="section-title"><div><h2>4. Mapa formi</h2><p>Koja forma pripada kojoj fazi i kada se šalje.</p></div></div>
+  <div id="guideForms" class="form-map"></div>
+  <div class="guide-note" style="margin-top:12px"><b>Pravilo:</b> ako link forme još nije definisan, alat treba da prikaže <b>TBD</b> umesto da izmišlja link. Link se zatim unosi u Podešavanja ili centralnu Google Drive tabelu.</div>
+
+  <div class="section-title"><div><h2>5. Preporučeni dnevni red vlasnice</h2><p>Najjednostavniji način da alat bude stvarno koristan svakog dana.</p></div></div>
+  <div class="guide-grid">
+    <div class="guide-card"><h3>09:00 — Dashboard</h3><p>Pregled HOT leadova, sledećih koraka, kašnjenja uplata i emailova za proveru.</p></div>
+    <div class="guide-card"><h3>09:10 — CRM</h3><p>Obradi sve leadove kojima je follow-up danas ili kasni. Promeni status tek kada je sledeća faza zaista nastupila.</p></div>
+    <div class="guide-card"><h3>09:20 — Email centar</h3><p>Proveri generisane draftove, BCC listu i tekst. Tek onda otvori Gmail i pošalji.</p></div>
+    <div class="guide-card"><h3>Jednom nedeljno — Grupe</h3><p>Kapacitet, popunjenost, prihod i potreba za novim terminom / trenerom.</p></div>
+    <div class="guide-card"><h3>Jednom nedeljno — Automatizacije</h3><p>Proveri da li trenutni redosled procesa i reminder-i odgovaraju realnom radu.</p></div>
+    <div class="guide-card"><h3>30 dana pre kraja — Renewal</h3><p>Pripremi sledeći nivo, segment klijenata i individualnu ponudu.</p></div>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <div class="page-header">
+    <div><div class="page-kicker"><span class="config-pill">PODEŠAVANJE</span> Sistem</div><h2>Podešavanja</h2><p>Veza sa centralnom bazom, forme programa i nivoi pristupa. Tehnički URL se podešava samo jednom.</p></div>
+  </div>
+  <div class="settings-grid">
+    <div class="card panel connection-card">
+      <div class="settings-card-head"><div><h3>Google Sheets baza</h3><p>Centralni izvor podataka i backup.</p></div><span class="badge ok">LBD Boost Control Center - Data</span></div>
+      <div class="connection-diagram"><span>Aplikacija</span><b>→</b><span>Apps Script API</span><b>→</b><span>Google Sheet</span></div>
+      <p class="settings-explain"><b>Šta ovde unosiš?</b> U normalnom radu — ništa. Ako aplikaciju koristiš preko Apps Script URL-a, veza je automatska. Kada pređemo na Vercel, samo jednom se unosi tvoj Apps Script <code>/exec</code> URL kao backend.</p>
+      <div class="settings-actions"><button class="admin-action btn primary" onclick="testDirectWrite()">Testiraj vezu sa bazom</button><button class="btn" onclick="loadStateFromDrive(true)">Osveži podatke</button><button class="btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1DDQjZTbKTqp29ArTdx-4r9XSqdoe7kWW5pUQTR1D5Zs/edit','_blank')">Otvori Google Sheet</button></div>
+      <div class="connection-meta"><span>Poslednji sync: <b id="lastSyncText">—</b></span><div id="serverHealth" class="server-health"></div></div>
+      <details class="advanced-settings"><summary>Napredna podešavanja veze</summary><div class="field"><label>Apps Script backend URL <span class="help-tip" data-tip="Potreban je samo kada je frontend na Vercelu. Nalepi URL koji se završava sa /exec. Ako aplikacija radi direktno kroz Apps Script, ostavi prazno.">?</span></label><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"/></div><div class="settings-actions"><button class="admin-action btn" onclick="connectDrive()">Sačuvaj / poveži</button><button class="admin-action btn" onclick="syncStateToDrive(true)">Full sync</button></div></details>
+    </div>
+    <div class="card panel">
+      <div class="settings-card-head"><div><h3>Program i komunikacija</h3><p>Linkovi koje automatizacije i email template-i koriste.</p></div></div>
+      <div class="field"><label>Owner / test email</label><input id="ownerEmail" placeholder="email@example.com"/></div>
+      <div class="field" style="margin-top:10px"><label>Onboarding forma <span class="help-tip" data-tip="Link koji klijent dobija nakon upisa, ako pravilo automatizacije koristi onboarding formu.">?</span></label><input id="onboardingUrl"/></div>
+      <div class="field" style="margin-top:10px"><label>Renewal forma <span class="help-tip" data-tip="Opciona forma za izbor nastavka / sledećeg nivoa programa.">?</span></label><input id="renewalUrl"/></div>
+      <div class="field" style="margin-top:10px"><label>Sample trening / video</label><input id="sampleUrl"/></div>
+      <div class="settings-actions"><button class="admin-action btn primary" onclick="saveSettings()">Sačuvaj podešavanja</button><button class="admin-action btn" onclick="testGmail()">Test Gmail</button></div>
+    </div>
+  </div>
+  <div class="section-title"><div><h2>Nivoi pristupa</h2><p>Autorizacija se vezuje za username u tabeli Users.</p></div></div>
+  <div class="access-grid"><div class="access-card admin"><span>ADMIN</span><h3>Pun pristup</h3><p>Unos i izmena podataka, kvalifikacija, profili klijenata, email, automatizacije i sync.</p></div><div class="access-card viewer"><span>VIEWER</span><h3>Samo pregled</h3><p>Može da vidi Dashboard, CRM, kalendar i profile, ali ne može da promeni podatke.</p></div></div>
+</section>
+
+</div></main></div>
+
+<!-- Lead modal -->
+<div id="leadModal" class="modal-backdrop"><div class="modal"><h3>Novi lead</h3><p class="tiny">Opisni podaci omogućavaju bolju segmentaciju i sledeći korak.</p>
+<div class="form-grid three">
+  <div class="field"><label>Ime i prezime</label><input id="leadName"/></div>
+  <div class="field"><label>Email</label><input id="leadEmail" type="email"/></div>
+  <div class="field"><label>Telefon</label><input id="leadPhone"/></div>
+  <div class="field"><label>Instagram username</label><input id="leadInstagram"/></div>
+  <div class="field"><label>Izvor</label><select id="leadSource"><option>Instagram</option><option>Preporuka</option><option>Vodič</option><option>Webinar</option><option>DM</option><option>Google forma</option><option>Drugo</option></select></div>
+  <div class="field"><label>Kampanja</label><input id="leadCampaign" value="Dec 2026 upis"/></div>
+  <div class="field"><label>Format</label><select id="leadFormat"><option>UŽIVO</option><option>ONLINE</option><option>OBA</option></select></div>
+  <div class="field"><label>Program</label><select id="leadProgram"></select></div>
+  <div class="field"><label>Termin</label><input id="leadSlot" placeholder="UTO/ČET 19h"/></div>
+  <div class="field"><label>Cena odgovara</label><select id="leadPrice"><option value="yes">DA</option><option value="info">TREBA INFO</option><option value="no">NE</option></select></div>
+  <div class="field"><label>Spremnost</label><select id="leadIntent"><option value="ready">SPREMNA ODMAH</option><option value="interested">VEOMA ZAINTERESOVANA</option><option value="researching">ISTRAŽUJE</option></select></div>
+  <div class="field"><label>Komunikacija</label><select id="leadComms"><option>Email</option><option>Instagram</option><option>Email + Instagram</option><option>Telefon</option></select></div>
+  <div class="field full"><label>Glavni cilj</label><input id="leadGoal"/></div>
+  <div class="field full"><label>Najveći izazov</label><input id="leadChallenge"/></div>
+  <div class="field"><label>Sledeći follow-up</label><input id="leadFollowup" type="date"/></div>
+  <div class="field full"><label>Napomena</label><textarea id="leadNote"></textarea></div>
+</div><div class="modal-actions"><button class="btn" onclick="closeModal('leadModal')">Otkaži</button><button class="btn primary" onclick="saveLead()">Sačuvaj lead</button></div></div></div>
+
+<!-- Client / enrollment modal -->
+<div id="clientModal" class="modal-backdrop"><div class="modal"><h3>Upis klijenta</h3><p class="tiny">Dodaj ručno ili izaberi osobu iz CRM baze. Program automatski popunjava cenu i preporučeni period.</p>
+<div class="form-grid three">
+  <div class="field"><label>Način unosa</label><select id="clientMode" onchange="toggleClientMode()"><option value="crm">Iz CRM baze</option><option value="manual">Ručni unos</option></select></div>
+  <div class="field" id="crmLeadWrap"><label>Lead iz CRM-a</label><select id="clientLeadSelect" onchange="applyLeadToClient()"></select></div>
+  <div class="field"><label>Ime i prezime</label><input id="clientName"/></div>
+  <div class="field"><label>Email</label><input id="clientEmail" type="email"/></div>
+  <div class="field"><label>Telefon</label><input id="clientPhone"/></div>
+  <div class="field"><label>Instagram</label><input id="clientInstagram"/></div>
+  <div class="field"><label>Program</label><select id="clientProgram" onchange="applyProgramDefaults()"></select></div>
+  <div class="field"><label>Grupa</label><select id="clientGroup"></select></div>
+  <div class="field"><label>Status</label><select id="clientStatus"><option>UPISANA</option><option>ONBOARDING</option><option>AKTIVNA</option><option>RENEWAL</option><option>ZAVRŠILA</option></select></div>
+  <div class="field"><label>Početak</label><input id="clientStart" type="date"/></div>
+  <div class="field"><label>Kraj</label><input id="clientEnd" type="date"/></div>
+  <div class="field"><label>Vrednost programa (€)</label><input id="clientValue" type="number" step="0.01"/></div>
+  <div class="field"><label>Plan plaćanja</label><select id="clientPaymentPlan"><option>3 × 125 €</option><option>Jednokratno</option><option>Drugo</option></select></div>
+  <div class="field full"><label>Glavni cilj</label><input id="clientGoal"/></div>
+  <div class="field full"><label>Fokus za rad</label><input id="clientFocus"/></div>
+</div><div class="modal-actions"><button class="btn" onclick="closeModal('clientModal')">Otkaži</button><button class="btn primary" onclick="saveClient()">Sačuvaj upis</button></div></div></div>
+
+<div id="paymentModal" class="modal-backdrop"><div class="modal"><h3>Nova uplata / rata</h3>
+<div class="form-grid">
+ <div class="field"><label>Klijent</label><select id="paymentClient"></select></div>
+ <div class="field"><label>Rata</label><select id="paymentInstallment"><option>1/3</option><option>2/3</option><option>3/3</option><option>Jednokratno</option></select></div>
+ <div class="field"><label>Iznos (€)</label><input id="paymentAmount" type="number" value="125"/></div>
+ <div class="field"><label>Rok</label><input id="paymentDue" type="date"/></div>
+ <div class="field"><label>Status</label><select id="paymentStatus"><option>ČEKA</option><option>PLAĆENO</option><option>ODLOŽENO</option></select></div>
+ <div class="field"><label>Datum uplate</label><input id="paymentDate" type="date"/></div>
+</div><div class="modal-actions"><button class="btn" onclick="closeModal('paymentModal')">Otkaži</button><button class="btn primary" onclick="savePayment()">Sačuvaj</button></div></div></div>
+
+<div id="groupModal" class="modal-backdrop"><div class="modal"><h3>Nova grupa</h3>
+<div class="form-grid three">
+ <div class="field"><label>Naziv</label><input id="groupName"/></div>
+ <div class="field"><label>Program</label><select id="groupProgram"></select></div>
+ <div class="field"><label>Format</label><select id="groupFormat"><option>UŽIVO</option><option>ONLINE</option></select></div>
+ <div class="field"><label>Početak</label><input id="groupStart" type="date"/></div>
+ <div class="field"><label>Kraj</label><input id="groupEnd" type="date"/></div>
+ <div class="field"><label>Raspored</label><input id="groupSchedule" placeholder="UTO/ČET 19h"/></div>
+ <div class="field"><label>Kapacitet</label><input id="groupCapacityInput" type="number" value="8"/></div>
+ <div class="field"><label>Cena (€)</label><input id="groupPrice" type="number" value="375"/></div>
+</div><div class="modal-actions"><button class="btn" onclick="closeModal('groupModal')">Otkaži</button><button class="btn primary" onclick="saveGroup()">Sačuvaj grupu</button></div></div></div>
+
+<div id="calendarModal" class="modal-backdrop"><div class="modal"><h3>Novi događaj / rok</h3>
+<div class="form-grid three">
+ <div class="field"><label>Kategorija</label><select id="calCategory"><option>MARKETING</option><option>PRODAJA</option><option>NAPLATA</option><option>ONBOARDING</option><option>PROGRAM</option><option>RETENCIJA</option></select></div>
+ <div class="field"><label>Naziv</label><input id="calName"/></div>
+ <div class="field"><label>Datum</label><input id="calDate" type="date"/></div>
+ <div class="field"><label>Vreme</label><input id="calTime" type="time"/></div>
+ <div class="field"><label>Program</label><select id="calProgram"></select></div>
+ <div class="field"><label>Owner</label><input id="calOwner" value="Nataša"/></div>
+ <div class="field full"><label>Automatska akcija</label><input id="calAction"/></div>
+</div><div class="modal-actions"><button class="btn" onclick="closeModal('calendarModal')">Otkaži</button><button class="btn primary" onclick="saveCalendarEvent()">Sačuvaj događaj</button></div></div></div>
+
+
+<div id="client360Modal" class="modal-backdrop"><div class="modal">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+    <div><h3 id="client360Name">Profil klijenta</h3><p id="client360Subtitle" class="tiny"></p></div>
+    <button class="btn small" onclick="closeModal('client360Modal')">Zatvori</button>
+  </div>
+  <div id="client360Body"></div>
+</div></div>
+
+<div id="toast" class="toast"></div>
+
+
+
+<script>
+
+const AUTH_KEY='lbd_boost_auth_v11';
+const PILOT_LOCAL_USERS={
+  admin:{username:'admin',displayName:'Administrator',role:'ADMIN',permissions:['VIEW','CREATE','EDIT','DELETE','EMAIL','AUTOMATIONS','USERS']},
+  viewer:{username:'viewer',displayName:'Osnovni korisnik',role:'VIEWER',permissions:['VIEW']}
+};
+let currentUser=null;
+function isAppsScriptHosted(){return typeof google!=='undefined' && google.script && google.script.run}
+function canEdit(){return currentUser && currentUser.role==='ADMIN'}
+function requireAdmin(){if(!canEdit()){showToast('Ova akcija zahteva ADMIN pristup');return false}return true}
+function loadAuthSession(){
+  try{
+    const s=JSON.parse(localStorage.getItem(AUTH_KEY)||'null');
+    if(s && s.expiresAt>Date.now())return s.user;
+  }catch(e){}
+  return null;
+}
+function saveAuthSession(user){
+  localStorage.setItem(AUTH_KEY,JSON.stringify({user,expiresAt:Date.now()+30*24*60*60*1000}));
+}
+function clearAuthSession(){localStorage.removeItem(AUTH_KEY)}
+function callAppsScript(fn,args=[]){
+  return new Promise((resolve,reject)=>{
+    try{
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(err=>reject(new Error(err&&err.message?err.message:String(err))))[fn](...args);
+    }catch(e){reject(e)}
+  });
+}
+async function serverLogin(username,password){
+  if(isAppsScriptHosted()) return await callAppsScript('apiLogin',[username,password||'']);
+  const url=apiUrl();
+  if(url){
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login',username,password:password||''})});
+    return await res.json();
+  }
+  const u=PILOT_LOCAL_USERS[String(username||'').toLowerCase()];
+  return u?{ok:true,user:u,pilotLocal:true}:{ok:false,error:'Nepoznato korisničko ime'};
+}
+async function loginUser(){
+  const username=(document.getElementById('loginUsername').value||'').trim().toLowerCase();
+  const password=document.getElementById('loginPassword').value||'';
+  if(!username){document.getElementById('loginError').textContent='Unesi korisničko ime.';return}
+  try{
+    const res=await serverLogin(username,password);
+    if(!res||!res.ok)throw new Error(res&&res.error?res.error:'Prijava nije uspela');
+    currentUser={...res.user,sessionToken:res.sessionToken||res.user?.sessionToken||''};saveAuthSession(currentUser);applyAuthUI();
+    document.getElementById('loginOverlay').classList.add('hidden');
+    if(isAppsScriptHosted()||apiUrl()) await loadStateFromDrive(false);
+    renderAll();
+  }catch(e){document.getElementById('loginError').textContent=e.message}
+}
+function logoutUser(){currentUser=null;clearAuthSession();document.getElementById('loginOverlay').classList.remove('hidden');document.body.classList.remove('role-viewer','role-admin')}
+function applyAuthUI(){
+  document.body.classList.toggle('role-viewer',currentUser?.role==='VIEWER');
+  document.body.classList.toggle('role-admin',currentUser?.role==='ADMIN');
+  document.getElementById('userNameText').textContent=currentUser?.displayName||currentUser?.username||'—';
+  document.getElementById('userRoleText').textContent=currentUser?.role||'—';
+  document.getElementById('userAvatar').textContent=(currentUser?.displayName||currentUser?.username||'?').slice(0,1).toUpperCase();
+}
+
+const KEY='lbd_boost_control_center_v13';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/1DDQjZTbKTqp29ArTdx-4r9XSqdoe7kWW5pUQTR1D5Zs/edit';
+const CLOUD_API_TOKEN='';
+
+const defaultPrograms=[
+ {id:'PRG-BOOST-L1-LIVE',name:'LBD Boost – Level 1',format:'UŽIVO',level:'LEVEL 1',months:3,price:375,capacity:8,start:'2026-12-01',end:'2027-02-28'},
+ {id:'PRG-BOOST-L1-ONLINE',name:'LBD Boost – Level 1',format:'ONLINE',level:'LEVEL 1',months:3,price:375,capacity:20,start:'2026-12-01',end:'2027-02-28'},
+ {id:'PRG-EVOLVE-L2-LIVE',name:'LBD Evolve – Level 2',format:'UŽIVO',level:'LEVEL 2 / EVOLVE',months:3,price:'',capacity:8,start:'',end:''},
+ {id:'PRG-EVOLVE-L2-ONLINE',name:'LBD Evolve – Level 2',format:'ONLINE',level:'LEVEL 2 / EVOLVE',months:3,price:'',capacity:20,start:'',end:''},
+ {id:'PRG-MEMBERS',name:'LBD Members / Advanced',format:'OBA',level:'MEMBERS / ADVANCED',months:4,price:'',capacity:20,start:'',end:''},
+ {id:'PRG-SUMMER',name:'LBD Summer Intense',format:'ONLINE',level:'SUMMER INTENSE',months:2,price:'',capacity:30,start:'2027-07-01',end:'2027-08-31'},
+ {id:'PRG-CONSULT',name:'Individualna konsultacija',format:'ONLINE',level:'1:1',months:0,price:'',priceRsd:5000,capacity:1,start:'',end:''}
+];
+
+const defaultProcess=[
+ {order:10,id:'STG-MKT',phase:'MARKETING',name:'Privlačenje pažnje',owner:'Marketing / CEO',auto:'Sadržaj, vodič, boost objave i webinar vode na waiting listu.',manual:'CEO proverava poruku i ponudu.'},
+ {order:20,id:'STG-LEAD',phase:'CRM',name:'Novi lead',owner:'CRM / Prodaja',auto:'Kreira CRM zapis, score i HOT/WARM/NURTURE segment.',manual:'Provera duplikata i podataka.'},
+ {order:30,id:'STG-QUAL',phase:'PRODAJA',name:'Kvalifikacija',owner:'Prodaja',auto:'Program + cena + spremnost određuju prioritet.',manual:'HOT lead ide na finalnu proveru.'},
+ {order:40,id:'STG-NURTURE',phase:'PRODAJA',name:'Nurture / Webinar',owner:'Marketing / Prodaja',auto:'Webinar, sample trening i follow-up reminder-i.',manual:'Vlasnica može izuzeti kontakte.'},
+ {order:50,id:'STG-SALE',phase:'PRODAJA',name:'Ponuda',owner:'Prodaja',auto:'Priprema program, cenu i rok.',manual:'Finalna provera mesta i uslova.'},
+ {order:60,id:'STG-PAY',phase:'NAPLATA',name:'Uplata / rezervacija',owner:'Administracija',auto:'Instrukcije + reminder D-3 / D-1.',manual:'Potvrda uplate.'},
+ {order:70,id:'STG-ONB',phase:'ONBOARDING',name:'Onboarding',owner:'Administracija',auto:'Ugovor + saglasnost + forma nakon upisa.',manual:'Proveriti kompletnost.'},
+ {order:80,id:'STG-LOG',phase:'ONBOARDING',name:'Logistika',owner:'Operativa',auto:'Raspored, oprema i community pristup.',manual:'Provera pristupa i termina.'},
+ {order:90,id:'STG-DELIVERY',phase:'PROGRAM',name:'Realizacija',owner:'Trener / Operativa',auto:'Praćenje sesija, kapaciteta i statusa.',manual:'Trener beleži odstupanja.'},
+ {order:100,id:'STG-PROGRESS',phase:'RETENCIJA',name:'30 / 60 / 90 progress',owner:'Trener / Client Success',auto:'Podsetnik + progress forma.',manual:'Provera rezultata i rizika od odustajanja.'},
+ {order:110,id:'STG-RENEWAL',phase:'RETENCIJA',name:'Renewal',owner:'Prodaja / Client Success',auto:'30 dana pre kraja priprema renewal segment.',manual:'Vlasnica bira program i primaoce.'},
+ {order:120,id:'STG-NEXT',phase:'RETENCIJA',name:'Sledeći nivo',owner:'Operativa / Prodaja',auto:'Prebacivanje u sledeći program / grupu.',manual:'Kapacitet i cena.'},
+ {order:130,id:'STG-REFERRAL',phase:'LOYALTY',name:'Testimonial / preporuka',owner:'Marketing / Client Success',auto:'Draft zahteva za testimonial i referral.',manual:'Saglasnost pre objave.'},
+ {order:140,id:'STG-ALUMNI',phase:'LOYALTY',name:'Alumni / nurture',owner:'Marketing',auto:'Ostaje u CRM segmentu za sledeći ciklus.',manual:'Opt-out po potrebi.'}
+];
+
+const defaultCalendar=[
+ {id:'CAL-001',category:'MARKETING',name:'Kampanja za webinar',date:'2026-09-21',time:'',audience:'Waiting list',programId:'PRG-BOOST-L1-LIVE',action:'Pokreni sadržaj + boost + vodič',templateId:'TPL-WAIT-01',owner:'Marketing'},
+ {id:'CAL-002',category:'MARKETING',name:'Besplatan webinar',date:'2026-10-10',time:'18:00',audience:'Leadovi / waiting list',programId:'PRG-BOOST-L1-LIVE',action:'D-7 i D-1 reminder + prodajni CTA',templateId:'TPL-WEB-01',owner:'CEO / Marketing'},
+ {id:'CAL-003',category:'PRODAJA',name:'Početak prodaje za postojeće klijente',date:'2026-11-09',time:'',audience:'Aktivni klijenti',programId:'PRG-EVOLVE-L2-LIVE',action:'Renewal segment + ponuda',templateId:'TPL-REN-01',owner:'Prodaja'},
+ {id:'CAL-004',category:'NAPLATA',name:'1. deadline za uplatu',date:'2026-11-15',time:'',audience:'Čeka uplatu',programId:'PRG-BOOST-L1-LIVE',action:'Reminder D-3 i D-1',templateId:'TPL-PAY-REM',owner:'Administracija'},
+ {id:'CAL-005',category:'NAPLATA',name:'2. deadline za uplatu',date:'2026-11-23',time:'',audience:'Čeka uplatu',programId:'PRG-BOOST-L1-LIVE',action:'Reminder D-3 i D-1',templateId:'TPL-PAY-REM',owner:'Administracija'},
+ {id:'CAL-006',category:'ONBOARDING',name:'Slanje logistike i opreme',date:'2026-11-27',time:'',audience:'Upisani / onboarding',programId:'PRG-BOOST-L1-LIVE',action:'Email logistike + community pristup',templateId:'TPL-LOG-01',owner:'Operativa'},
+ {id:'CAL-007',category:'PRODAJA',name:'Finalni upis',date:'2026-11-30',time:'',audience:'Čeka uplatu',programId:'PRG-BOOST-L1-LIVE',action:'Finalni follow-up',templateId:'TPL-PAY-REM',owner:'Prodaja'},
+ {id:'CAL-008',category:'PROGRAM',name:'Početak novog ciklusa',date:'2026-12-01',time:'',audience:'Upisani klijenti',programId:'PRG-BOOST-L1-LIVE',action:'Aktiviraj grupu i praćenje programa',templateId:'TPL-START-01',owner:'Operativa'},
+ {id:'CAL-009',category:'PROGRAM',name:'Opšti Zoom – energetske smernice',date:'2026-12-05',time:'',audience:'Svi aktivni klijenti',programId:'PRG-BOOST-L1-LIVE',action:'Reminder D-1 + snimak posle Zoom-a',templateId:'TPL-ZOOM-01',owner:'CEO'},
+ {id:'CAL-010',category:'NAPLATA',name:'Januarska rata',date:'2027-01-10',time:'',audience:'Klijenti na rate',programId:'PRG-BOOST-L1-LIVE',action:'Reminder D-5 i D-1',templateId:'TPL-PAY-REM',owner:'Administracija'},
+ {id:'CAL-011',category:'NAPLATA',name:'Februarska rata',date:'2027-02-05',time:'',audience:'Klijenti na rate',programId:'PRG-BOOST-L1-LIVE',action:'Reminder D-5 i D-1',templateId:'TPL-PAY-REM',owner:'Administracija'},
+ {id:'CAL-012',category:'RETENCIJA',name:'Kraj Level 1 ciklusa',date:'2027-02-28',time:'',audience:'Aktivni klijenti',programId:'PRG-BOOST-L1-LIVE',action:'Renewal kreće 30 dana ranije',templateId:'TPL-REN-01',owner:'Client Success'}
+];
+
+const defaultTemplates=[
+ {id:'TPL-WAIT-01',name:'Potvrda waiting liste',subject:'LBD Boost – prijava je evidentirana',body:'Zdravo {{ime}},\n\nhvala ti na prijavi. Tvoja prijava je evidentirana i dobićeš informacije o sledećem koraku, terminima i programu.\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-WEB-01',name:'Poziv na webinar',subject:'LBD Boost – besplatan webinar 10.10. u 18h',body:'Zdravo {{ime}},\n\npozivam te na besplatan LBD Boost webinar 10.10. u 18h. Na webinaru ćeš dobiti jasniju sliku o programu i načinu rada.\n\n{{form_link}}\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-HOT-01',name:'HOT lead – prvi follow-up',subject:'LBD Boost – sledeći korak',body:'Zdravo {{ime}},\n\nhvala ti na interesovanju za LBD Boost. Na osnovu prijave deluje da ti format programa odgovara i želela bih da ti pošaljem sledeći korak za upis.\n\n{{cta}}\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-OFFER-01',name:'Ponuda programa',subject:'LBD Boost – program od 1.12.',body:'Zdravo {{ime}},\n\nsledeći ciklus LBD Boost programa počinje 1.12. i traje tri meseca. Cena programa je 375 €, uz mogućnost plaćanja 3 × 125 €.\n\nAko želiš da rezervišeš mesto, odgovori na ovaj email.\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-PAY-01',name:'Instrukcije za uplatu',subject:'LBD Boost – instrukcije za uplatu',body:'Zdravo {{ime}},\n\nu nastavku su instrukcije za uplatu i potvrdu mesta u programu.\n\n{{payment_info}}\n\nNakon evidentirane uplate dobijaš onboarding dokumentaciju i logistiku programa.\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-PAY-REM',name:'Podsetnik za uplatu',subject:'LBD Boost – podsetnik za uplatu',body:'Zdravo {{ime}},\n\nkratak podsetnik da se približava rok za uplatu / potvrdu mesta u programu.\n\nAko si uplatu već izvršila, zanemari poruku.\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-ONB-01',name:'Onboarding nakon upisa',subject:'LBD Boost – onboarding i naredni koraci',body:'Zdravo {{ime}},\n\nmesto u programu je potvrđeno. Molim te da završiš onboarding kroz link ispod.\n\n{{form_link}}\n\nNakon popunjavanja dobijaš finalnu logistiku, opremu i pristup grupi za podršku.\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-LOG-01',name:'Logistika pre početka',subject:'LBD Boost – logistika, oprema i pristup grupi',body:'Zdravo {{ime}},\n\nu nastavku su finalne informacije za početak programa: raspored, oprema i pristup grupi za podršku.\n\n{{form_link}}\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-ZOOM-01',name:'Opšti Zoom smernice',subject:'LBD Boost – Zoom 5.12.',body:'Zdravo {{ime}},\n\nopšti Zoom za energetske smernice održava se 5.12. Snimak će biti dostupan svim učesnicama.\n\nSrdačno,\nLBD Boost'},
+ {id:'TPL-REN-01',name:'Renewal 30 dana pre kraja',subject:'LBD Boost – nastavak programa',body:'Zdravo {{ime}},\n\npribližava se završetak trenutnog ciklusa. Želim da ti pošaljem informacije o sledećem nivou programa i rezervaciji mesta.\n\n{{next_program}}\n\nSrdačno,\nLBD Boost'}
+];
+
+const defaultAutomations=[
+ {id:'RULE-005',on:true,order:1,phase:'CRM',mode:'EVENT',name:'Novi lead → potvrda prijave',trigger:'NEW_LEAD',delay:0,templateId:'TPL-WAIT-01',formTiming:'NO_FORM',review:true},
+ {id:'RULE-001',on:true,order:2,phase:'PRODAJA',mode:'EVENT',name:'HOT lead → prvi follow-up',trigger:'LEAD_BECOMES_HOT',delay:0,templateId:'TPL-HOT-01',formTiming:'SAMPLE_AFTER_EMAIL',review:true},
+ {id:'RULE-006',on:true,order:3,phase:'NURTURE',mode:'SCHEDULED',name:'Waiting list → webinar D-7',trigger:'WEBINAR_D7',delay:0,templateId:'TPL-WEB-01',formTiming:'FORM_OPTIONAL',review:true},
+ {id:'RULE-007',on:true,order:4,phase:'NURTURE',mode:'SCHEDULED',name:'Webinar → reminder D-1',trigger:'WEBINAR_D1',delay:0,templateId:'TPL-WEB-D1',formTiming:'NO_FORM',review:true},
+ {id:'RULE-008',on:true,order:5,phase:'PRODAJA',mode:'EVENT',name:'Kvalifikovana → ponuda programa',trigger:'STATUS:KVALIFIKOVANA',delay:0,templateId:'TPL-OFFER-01',formTiming:'NO_FORM',review:true},
+ {id:'RULE-002',on:true,order:6,phase:'NAPLATA',mode:'EVENT',name:'Čeka uplatu → instrukcije',trigger:'STATUS:ČEKA UPLATU',delay:0,templateId:'TPL-PAY-01',formTiming:'NO_FORM',review:true},
+ {id:'RULE-009',on:true,order:7,phase:'NAPLATA',mode:'SCHEDULED',name:'Uplata → D-3 / D-1 reminder',trigger:'PAYMENT_DUE',delay:0,templateId:'TPL-PAY-REM',formTiming:'NO_FORM',review:true},
+ {id:'RULE-003',on:true,order:8,phase:'ONBOARDING',mode:'EVENT',name:'Upisana → onboarding forma',trigger:'STATUS:UPISANA',delay:0,templateId:'TPL-ONB-01',formTiming:'FORM_AFTER_STATUS',review:true},
+ {id:'RULE-010',on:true,order:9,phase:'ONBOARDING',mode:'EVENT',name:'Onboarding kompletan → logistika',trigger:'ONBOARDING_COMPLETE',delay:0,templateId:'TPL-LOG-01',formTiming:'FORM_AFTER_STATUS',review:true},
+ {id:'RULE-011',on:true,order:10,phase:'PROGRAM',mode:'SCHEDULED',name:'Program → Zoom D-1',trigger:'CALENDAR:ZOOM',delay:0,templateId:'TPL-ZOOM-01',formTiming:'NO_FORM',review:true},
+ {id:'RULE-012',on:true,order:11,phase:'PROGRAM',mode:'MILESTONE',name:'30 / 60 / 90 → progress check',trigger:'PROGRAM_MILESTONE',delay:0,templateId:'TPL-PROGRESS-01',formTiming:'FORM_AFTER_EMAIL',review:true},
+ {id:'RULE-004',on:true,order:12,phase:'RETENCIJA',mode:'SCHEDULED',name:'30 dana do kraja → renewal',trigger:'RENEWAL_DUE',delay:0,templateId:'TPL-REN-01',formTiming:'NO_FORM',review:true},
+ {id:'RULE-013',on:true,order:13,phase:'LOYALTY',mode:'MILESTONE',name:'Kraj programa → testimonial',trigger:'PROGRAM_END',delay:0,templateId:'TPL-TEST-01',formTiming:'FORM_AFTER_EMAIL',review:true},
+ {id:'RULE-014',on:true,order:14,phase:'LOYALTY',mode:'SCHEDULED',name:'Bez renewal-a → alumni nurture',trigger:'ALUMNI_NURTURE',delay:10080,templateId:'TPL-WAIT-01',formTiming:'NO_FORM',review:true}
+];
+
+const sampleLeads=[
+ {id:'L-EX-001',name:'Ana Petrović',email:'ana.petrovic@example.com',phone:'+381601111111',instagram:'@ana.petrovic',source:'Instagram',campaign:'Dec 2026 upis',format:'UŽIVO',programId:'PRG-BOOST-L1-LIVE',slot:'UTO/ČET 19h',price:'yes',intent:'ready',goal:'Veće samopouzdanje i bolja povezanost sa telom',challenge:'Teško održava kontinuitet treninga',comms:'Email + Instagram',score:100,category:'HOT',status:'KVALIFIKOVANA',nextStep:'Poslati sample trening i proveriti dostupnost mesta',followup:'2026-09-24',note:'PILOT PRIMER',created:'2026-09-21'},
+ {id:'L-EX-002',name:'Milica Jovanović',email:'milica.jovanovic@example.com',phone:'+381602222222',instagram:'@milica.moves',source:'Webinar',campaign:'Webinar 10.10',format:'OBA',programId:'PRG-BOOST-L1-LIVE',slot:'Fleksibilno',price:'info',intent:'interested',goal:'Više sigurnosti u pokretu i senzualnom izražavanju',challenge:'Želi prvo da vidi način rada',comms:'Email',score:75,category:'HOT',status:'WAITING LIST',nextStep:'Poziv na webinar 10.10.',followup:'2026-10-03',note:'PILOT PRIMER',created:'2026-09-22'},
+ {id:'L-EX-003',name:'Jelena Ilić',email:'jelena.ilic@example.com',phone:'+381603333333',instagram:'@jelena.ilic',source:'Vodič',campaign:'Webinar 10.10',format:'ONLINE',programId:'PRG-BOOST-L1-ONLINE',slot:'Vikend',price:'yes',intent:'researching',goal:'Kontinuitet i bolji osećaj u telu',challenge:'Nije sigurna da li joj online format odgovara',comms:'Email',score:70,category:'WARM',status:'NURTURE',nextStep:'Nurture email + webinar',followup:'2026-10-03',note:'PILOT PRIMER',created:'2026-09-23'},
+ {id:'L-EX-004',name:'Marija Nikolić',email:'marija.nikolic@example.com',phone:'+381604444444',instagram:'@marija.n',source:'Preporuka',campaign:'Dec 2026 upis',format:'UŽIVO',programId:'PRG-BOOST-L1-LIVE',slot:'UTO/ČET 19h',price:'yes',intent:'ready',goal:'Samopouzdanje i redovna fizička aktivnost',challenge:'Želi strukturu i podršku grupe',comms:'Email + telefon',score:100,category:'HOT',status:'ČEKA UPLATU',nextStep:'Instrukcije za uplatu / potvrda mesta',followup:'2026-11-12',note:'PILOT PRIMER',created:'2026-09-20'},
+ {id:'L-EX-005',name:'Katarina Marković',email:'katarina.markovic@example.com',phone:'+381605555555',instagram:'@katarina.m',source:'Instagram',campaign:'Dec 2026 upis',format:'OBA',programId:'PRG-BOOST-L1-LIVE',slot:'Posle 18h',price:'info',intent:'researching',goal:'Više energije i osećaj ženstvenosti',challenge:'Cena i termin još nisu potpuno usklađeni',comms:'Instagram',score:55,category:'WARM',status:'WAITING LIST',nextStep:'Poslati FAQ i webinar poziv',followup:'2026-10-03',note:'PILOT PRIMER',created:'2026-09-23'},
+ {id:'L-EX-006',name:'Nina Lazić',email:'nina.lazic@example.com',phone:'+381606666666',instagram:'@nina.balance',source:'Instagram',campaign:'Dec 2026 upis',format:'ONLINE',programId:'PRG-BOOST-L1-ONLINE',slot:'SUB 10h',price:'yes',intent:'interested',goal:'Rad na samopouzdanju uz online fleksibilnost',challenge:'Česta putovanja',comms:'Email',score:85,category:'HOT',status:'PONUDA POSLATA',nextStep:'Finalni odgovor i ponuda',followup:'2026-09-25',note:'PILOT PRIMER',created:'2026-09-19'}
+];
+
+sampleLeads.push( {id:'L-EX-007',name:'Sara Babić',email:'sara.babic@example.com',phone:'+381607777777',instagram:'@sara.b',source:'Instagram',campaign:'Dec 2026 upis',format:'OBA',programId:'PRG-BOOST-L1-LIVE',slot:'Nije odlučila',price:'info',intent:'researching',goal:'Želi da sazna više o programu',challenge:'Nije još sigurna da li joj program trenutno odgovara',comms:'Instagram',score:35,autoCategory:'COLD',qualificationOverride:'AUTO',category:'COLD',status:'WAITING LIST',nextStep:'Nurture sadržaj / webinar',followup:'2026-10-03',note:'PILOT PRIMER',created:'2026-09-23'});
+
+const sampleGroups=[
+ {id:'G-SEP-L1',name:'Septembar 2026 – Uživo',programId:'PRG-BOOST-L1-LIVE',format:'UŽIVO',start:'2026-09-01',end:'2026-11-30',schedule:'UTO/ČET 19h',capacity:8,price:375,status:'AKTIVNA'},
+ {id:'G-DEC-L1-A',name:'Decembar 2026 – Uživo A',programId:'PRG-BOOST-L1-LIVE',format:'UŽIVO',start:'2026-12-01',end:'2027-02-28',schedule:'UTO/ČET 19h',capacity:8,price:375,status:'UPIS OTVOREN'},
+ {id:'G-DEC-ONL',name:'Decembar 2026 – Online',programId:'PRG-BOOST-L1-ONLINE',format:'ONLINE',start:'2026-12-01',end:'2027-02-28',schedule:'SUB 10h',capacity:20,price:375,status:'UPIS OTVOREN'}
+];
+
+const sampleClients=[
+ {id:'C-EX-001',leadId:'',name:'Tamara Savić',email:'tamara.savic@example.com',phone:'+381607111111',instagram:'@tamara.s',groupId:'G-SEP-L1',programId:'PRG-BOOST-L1-LIVE',status:'AKTIVNA',start:'2026-09-01',end:'2026-11-30',value:375,paymentPlan:'3 × 125 €',source:'Prethodni ciklus',created:'2026-08-25',goal:'Veće samopouzdanje i kontinuitet',focus:'Dobro reaguje na rad u grupi',onboarding:'ZAVRŠEN',renewalStatus:'PLANIRANO',nextStep:'Ponuda za Level 2 / nastavak 9.11.',owner:'Nataša',note:'PILOT PRIMER'},
+ {id:'C-EX-002',leadId:'L-EX-004',name:'Marija Nikolić',email:'marija.nikolic@example.com',phone:'+381604444444',instagram:'@marija.n',groupId:'G-DEC-L1-A',programId:'PRG-BOOST-L1-LIVE',status:'UPISANA',start:'2026-12-01',end:'2027-02-28',value:375,paymentPlan:'3 × 125 €',source:'Preporuka',created:'2026-11-14',goal:'Samopouzdanje i redovna fizička aktivnost',focus:'Potrebna jasna struktura i accountability',onboarding:'ČEKA',renewalStatus:'NIJE POKRENUT',nextStep:'Završiti onboarding i logistiku',owner:'Administracija',note:'PILOT PRIMER'},
+ {id:'C-EX-003',leadId:'',name:'Ivana Kovačević',email:'ivana.kovacevic@example.com',phone:'+381607333333',instagram:'@ivana.k',groupId:'G-SEP-L1',programId:'PRG-BOOST-L1-LIVE',status:'AKTIVNA',start:'2026-09-01',end:'2026-11-30',value:375,paymentPlan:'3 × 125 €',source:'Instagram',created:'2026-08-28',goal:'Više slobode u pokretu',focus:'Želi napredniji nivo posle ciklusa',onboarding:'ZAVRŠEN',renewalStatus:'PLANIRANO',nextStep:'Renewal razgovor i izbor Level 2',owner:'Nataša',note:'PILOT PRIMER'},
+ {id:'C-EX-004',leadId:'L-EX-006',name:'Nina Lazić',email:'nina.lazic@example.com',phone:'+381606666666',instagram:'@nina.balance',groupId:'G-DEC-ONL',programId:'PRG-BOOST-L1-ONLINE',status:'ONBOARDING',start:'2026-12-01',end:'2027-02-28',value:375,paymentPlan:'3 × 125 €',source:'Instagram',created:'2026-11-18',goal:'Fleksibilan rad uz putovanja',focus:'Online format zbog čestih putovanja',onboarding:'U TOKU',renewalStatus:'NIJE POKRENUT',nextStep:'Završiti onboarding formu',owner:'Administracija',note:'PILOT PRIMER'}
+];
+
+const sampleEnrollments=[
+ {id:'ENR-EX-001',clientId:'C-EX-001',groupId:'G-SEP-L1',programId:'PRG-BOOST-L1-LIVE',status:'AKTIVAN',enrolled:'2026-08-25',start:'2026-09-01',end:'2026-11-30',amount:375,paymentPlan:'3 × 125 €'},
+ {id:'ENR-EX-002',clientId:'C-EX-002',groupId:'G-DEC-L1-A',programId:'PRG-BOOST-L1-LIVE',status:'UPISAN',enrolled:'2026-11-14',start:'2026-12-01',end:'2027-02-28',amount:375,paymentPlan:'3 × 125 €'},
+ {id:'ENR-EX-003',clientId:'C-EX-003',groupId:'G-SEP-L1',programId:'PRG-BOOST-L1-LIVE',status:'AKTIVAN',enrolled:'2026-08-28',start:'2026-09-01',end:'2026-11-30',amount:375,paymentPlan:'3 × 125 €'},
+ {id:'ENR-EX-004',clientId:'C-EX-004',groupId:'G-DEC-ONL',programId:'PRG-BOOST-L1-ONLINE',status:'ONBOARDING',enrolled:'2026-11-18',start:'2026-12-01',end:'2027-02-28',amount:375,paymentPlan:'3 × 125 €'}
+];
+
+const samplePayments=[
+ {id:'P-EX-001',clientId:'C-EX-002',installment:'1/3',amount:125,due:'2026-11-15',status:'PLAĆENO',paidDate:'2026-11-14'},
+ {id:'P-EX-002',clientId:'C-EX-002',installment:'2/3',amount:125,due:'2027-01-10',status:'ČEKA',paidDate:''},
+ {id:'P-EX-003',clientId:'C-EX-002',installment:'3/3',amount:125,due:'2027-02-05',status:'ČEKA',paidDate:''},
+ {id:'P-EX-004',clientId:'C-EX-004',installment:'1/3',amount:125,due:'2026-11-23',status:'PLAĆENO',paidDate:'2026-11-22'},
+ {id:'P-EX-005',clientId:'C-EX-004',installment:'2/3',amount:125,due:'2027-01-10',status:'ČEKA',paidDate:''}
+];
+
+const DEFAULT_BACKEND_URL='/api/backend';
+
+const defaults={
+ appVersion:'v13',
+ settings:{apiUrl:'',ownerEmail:'',onboardingUrl:'',renewalUrl:'',sampleUrl:'',syncSeconds:5},
+ programs:defaultPrograms,processStages:defaultProcess,calendarEvents:defaultCalendar,emailTemplates:defaultTemplates,automationRules:defaultAutomations,users:Object.values(PILOT_LOCAL_USERS),
+ leads:sampleLeads,clients:sampleClients,groups:sampleGroups,enrollments:sampleEnrollments,payments:samplePayments,emailQueue:[]
+};
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function normalizeAutomationRules(rules){
+ const arr=(rules||[]).map(x=>({...x}));
+ arr.sort((a,b)=>(Number(a.order)||999)-(Number(b.order)||999));
+ arr.forEach((r,i)=>r.order=i+1);
+ return arr;
+}
+function loadState(){
+ try{
+  const x=JSON.parse(localStorage.getItem(KEY));
+  if(!x)return clone(defaults);
+  const merged={...clone(defaults),...x,settings:{...defaults.settings,...(x.settings||{})}};
+  if(x.appVersion!=='v13'){
+    merged.automationRules=clone(defaultAutomations);
+    merged.appVersion='v13';
+  }else{
+    const existing=new Map((x.automationRules||[]).map(r=>[r.id,r]));
+    merged.automationRules=normalizeAutomationRules(defaultAutomations.map(d=>({...d,...(existing.get(d.id)||{})})));
+  }
+  merged.leads=(merged.leads||[]).map(normalizeLeadQualification);return merged;
+ }catch(e){return clone(defaults)}
+}
+let state=loadState(); state.settings.apiUrl='/api/backend';
+function persistLocal(){localStorage.setItem(KEY,JSON.stringify(state))}
+function uid(p){return p+'-'+Date.now().toString(36).toUpperCase().slice(-6)}
+function apiUrl(){return '/api/backend'}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function openModal(id){document.getElementById(id).classList.add('show')} function closeModal(id){document.getElementById(id).classList.remove('show')}
+function money(n){if(n===''||n==null)return 'TBD';return new Intl.NumberFormat('sr-RS',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:2}).format(Number(n||0))}
+function fmtDate(v){if(!v)return '—';return new Date(v+'T00:00:00').toLocaleDateString('sr-RS')}
+function daysUntil(v){if(!v)return null;const a=new Date();a.setHours(0,0,0,0);const b=new Date(v+'T00:00:00');return Math.round((b-a)/86400000)}
+function badge(v){const x=String(v||'').toUpperCase();let c='gray';if(x==='HOT'||x==='ČEKA UPLATU'||x==='ČEKA')c='hot';else if(x==='WARM'||x==='ONBOARDING'||x==='U TOKU')c='warm';else if(['AKTIVNA','UPISANA','PLAĆENO','ZAVRŠEN','AKTIVAN'].includes(x))c='ok';else if(['KVALIFIKOVANA','RENEWAL','PONUDA POSLATA'].includes(x))c='info';else if(x==='COLD')c='gray';else if(x==='NURTURE')c='gold';return `<span class="badge ${c}">${v}</span>`}
+function programById(id){return state.programs.find(p=>p.id===id)||{}}
+function groupById(id){return state.groups.find(g=>g.id===id)||{}}
+function clientById(id){return state.clients.find(c=>c.id===id)||{}}
+function leadById(id){return state.leads.find(c=>c.id===id)||{}}
+let cloudBusy=false,cloudDirty=false,lastCloudSync='',cloudTimer=null;
+function setDriveStatus(kind,text){const d=document.getElementById('driveDot');d.className='status-dot '+(kind==='ok'?'':kind==='sync'?'sync':kind==='err'?'err':'off');document.getElementById('driveStatusText').textContent=text}
+async function saveState(){
+  persistLocal();renderAll();cloudDirty=true;
+  return true;
+}
+function driveAvailable(){return !!(isAppsScriptHosted()||apiUrl())}
+function cloudify(entityType,e){
+ const x=JSON.parse(JSON.stringify(e||{}));
+ if(entityType==='lead'){x.programName=programById(x.programId).name||x.programId||''}
+ if(entityType==='client'){const p=programById(x.programId);x.programName=p.name||x.programId||'';x.level=p.level||'';x.format=p.format||x.format||''}
+ if(entityType==='group'){x.level=programById(x.programId).level||''}
+ if(entityType==='payment'){x.groupId=clientById(x.clientId).groupId||x.groupId||''}
+ if(entityType==='enrollment'){const p=programById(x.programId);x.programName=p.name||x.programId||'';x.level=p.level||''}
+ return x;
+}
+async function directUpsert(entityType,entity){
+ if(!canEdit()||!driveAvailable())return false;
+ setDriveStatus('sync','Drive: direktni upis…');
+ try{
+   const payload=cloudify(entityType,entity);let data;
+   if(isAppsScriptHosted())data=await callAppsScript('apiUpsertEntity',[entityType,payload,currentUser?.sessionToken||'']);
+   else{
+     const r=await fetch(apiUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'upsert',entityType,entity:payload,sessionToken:currentUser?.sessionToken||''})});
+     data=await r.json();
+   }
+   if(!data||!data.ok)throw new Error(data&&data.error?data.error:'Direktni upis nije uspeo');
+   lastCloudSync=data.savedAt||new Date().toISOString();cloudDirty=false;
+   setDriveStatus('ok','Drive LIVE • '+new Date(lastCloudSync).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+   const el=document.getElementById('lastSyncText');if(el)el.textContent=new Date(lastCloudSync).toLocaleString('sr-RS');
+   return true;
+ }catch(e){cloudDirty=true;setDriveStatus('err','Drive: greška');showToast('Drive upis nije uspeo: '+e.message);return false}
+}
+async function directBatchUpsert(items){
+ if(!canEdit()||!driveAvailable())return false;
+ setDriveStatus('sync','Drive: direktni batch upis…');
+ try{
+   const clean=(items||[]).map(i=>({entityType:i.entityType,entity:cloudify(i.entityType,i.entity)}));let data;
+   if(isAppsScriptHosted())data=await callAppsScript('apiBatchUpsert',[clean,currentUser?.sessionToken||'']);
+   else{
+     const r=await fetch(apiUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'batchUpsert',items:clean,sessionToken:currentUser?.sessionToken||''})});
+     data=await r.json();
+   }
+   if(!data||!data.ok)throw new Error(data&&data.error?data.error:'Batch upis nije uspeo');
+   lastCloudSync=data.savedAt||new Date().toISOString();cloudDirty=false;
+   setDriveStatus('ok','Drive LIVE • '+new Date(lastCloudSync).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+   return true;
+ }catch(e){cloudDirty=true;setDriveStatus('err','Drive: greška');showToast('Drive batch upis nije uspeo: '+e.message);return false}
+}
+async function testDirectWrite(){
+ if(!requireAdmin())return;
+ if(!driveAvailable())return showToast('Aplikacija još nije povezana sa Apps Script Web App-om');
+ try{
+   let data;
+   if(isAppsScriptHosted())data=await callAppsScript('apiTestWrite',[currentUser?.sessionToken||'']);
+   else{
+     const r=await fetch(apiUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'testWrite',sessionToken:currentUser?.sessionToken||''})});
+     data=await r.json();
+   }
+   if(!data||!data.ok)throw new Error(data&&data.error?data.error:'Test nije uspeo');
+   setDriveStatus('ok','Drive LIVE • test uspešan');
+   showToast('Direktan upis radi — test red je dodat u Aktivnosti');
+ }catch(e){showToast('Test direktnog upisa: '+e.message)}
+}
+async function syncStateToDrive(showMessage=false){
+  if(!canEdit()){if(showMessage)showToast('VIEWER pristup ne može menjati bazu');return false}
+  if(!isAppsScriptHosted()&&!apiUrl()){if(showMessage)showToast('Poveži Apps Script backend ili koristi hostovanu verziju');return false}
+  if(cloudBusy){cloudDirty=true;return false}
+  cloudBusy=true;cloudDirty=false;setDriveStatus('sync','Drive: upisujem…');
+  try{
+    let data;
+    if(isAppsScriptHosted()){
+      data=await callAppsScript('apiSync',[state,currentUser?.sessionToken||'']);
+    }else{
+      const res=await fetch(apiUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'sync',state,sessionToken:currentUser?.sessionToken||''})});
+      data=await res.json();
+    }
+    if(!data||!data.ok)throw new Error(data&&data.error?data.error:'Cloud sync nije uspeo');
+    lastCloudSync=data.savedAt||new Date().toISOString();
+    setDriveStatus('ok','Drive: sačuvano '+new Date(lastCloudSync).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+    document.getElementById('lastSyncText').textContent=new Date(lastCloudSync).toLocaleString('sr-RS');
+    if(showMessage)showToast('Podaci su odmah upisani na Google Drive');
+    return true;
+  }catch(e){
+    setDriveStatus('err','Drive: greška');
+    if(showMessage)showToast('Drive sync: '+e.message);
+    return false;
+  }finally{
+    cloudBusy=false;
+    if(cloudDirty){cloudDirty=false;setTimeout(()=>syncStateToDrive(false),80)}
+  }
+}
+async function loadStateFromDrive(showMessage=false){
+  if(!isAppsScriptHosted()&&!apiUrl()){if(showMessage)showToast('Poveži Apps Script backend');return false}
+  setDriveStatus('sync','Drive: učitavanje…');
+  try{
+    let data;
+    if(isAppsScriptHosted()){
+      data=await callAppsScript('apiLoad',[currentUser?.sessionToken||'']);
+    }else{
+      const res=await fetch(apiUrl()+'?action=load&sessionToken='+encodeURIComponent(currentUser?.sessionToken||''));
+      data=await res.json();
+    }
+    if(!data||!data.ok)throw new Error(data&&data.error?data.error:'Cloud load nije uspeo');
+    if(data.state){
+      const keep=state.settings.apiUrl;
+      state={...clone(defaults),...data.state,settings:{...defaults.settings,...(data.state.settings||{}),apiUrl:keep||data.state.settings?.apiUrl||''}};
+      state.leads=(state.leads||[]).map(normalizeLeadQualification);
+      persistLocal();renderAll();
+    }
+    lastCloudSync=data.lastSync||'';
+    setDriveStatus('ok',isAppsScriptHosted()?'Drive: Apps Script povezan':'Drive: povezan');
+    if(lastCloudSync)document.getElementById('lastSyncText').textContent=new Date(lastCloudSync).toLocaleString('sr-RS');
+    if(showMessage)showToast('Učitano sa Google Drive-a');
+    return true;
+  }catch(e){
+    setDriveStatus('err','Drive: greška');
+    if(showMessage)showToast('Drive load: '+e.message);
+    return false;
+  }
+}
+async function connectDrive(){
+  if(!requireAdmin())return;
+  state.settings.apiUrl=document.getElementById('apiUrl').value.trim();persistLocal();
+  if(isAppsScriptHosted()){await loadStateFromDrive(false);showToast('Apps Script hosting je već povezan');return}
+  if(!apiUrl())return showToast('Unesi Apps Script Web App URL');
+  await loadStateFromDrive(false);await syncStateToDrive(false);showToast('Google Drive baza je povezana');
+}
+setInterval(()=>{if(cloudDirty&&canEdit()&&driveAvailable())syncStateToDrive(false)},5000);
+function goPage(id){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+ const names={dashboard:'Dashboard',leads:'CRM / Leadovi',clients:'Klijenti',enrollments:'Upisi na program',payments:'Uplate',groups:'Grupe',calendar:'Kalendar i podsetnici',process:'Tok procesa',emailCenter:'Email centar',automations:'Automatizacije',guide:'Uputstvo',settings:'Podešavanja'};
+ document.getElementById('pageTitle').textContent=names[id]||id;
+ const inputPages=['leads','clients','enrollments','payments','groups','calendar','emailCenter'];const setupPages=['automations','settings'];
+ pageModeBadge.textContent=inputPages.includes(id)?'UNOS':setupPages.includes(id)?'PODEŠAVANJE':'PREGLED';pageModeBadge.className='page-mode '+(inputPages.includes(id)?'input':setupPages.includes(id)?'setup':'view');
+ if(id==='emailCenter')prepareEmailCenter();window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-page]');if(b)goPage(b.dataset.page)});
+
+function calcLeadScore(l){let s=0;if(l.price==='yes')s+=35;else if(l.price==='info')s+=15;if(l.intent==='ready')s+=35;else if(l.intent==='interested')s+=25;else if(l.intent==='researching')s+=10;if(l.email)s+=10;if(l.format)s+=10;if(l.source)s+=10;return Math.min(s,100)}
+function leadCategory(s){return s>=75?'HOT':s>=45?'WARM':'COLD'}
+function normalizeLeadQualification(l){
+  if(!l.autoCategory)l.autoCategory=leadCategory(Number(l.score||0));
+  if(!l.qualificationOverride)l.qualificationOverride='AUTO';
+  l.category=l.qualificationOverride!=='AUTO'?l.qualificationOverride:l.autoCategory;
+  return l;
+}
+async function changeLeadQualification(id,value){
+  if(!requireAdmin())return;
+  const l=leadById(id);if(!l)return;
+  const old=l.category;
+  l.qualificationOverride=value;
+  normalizeLeadQualification(l);
+  if(old!=='HOT'&&l.category==='HOT')autoQueueFor(l,'LEAD_BECOMES_HOT','lead');
+  await saveState();const live=await directUpsert('lead',l);saveToast(live,'Kvalifikacija je odmah upisana u Leadovi tabelu');
+}
+function contractedRevenue(){return state.clients.reduce((a,c)=>a+Number(c.value||0),0)}
+function paidRevenue(){return state.payments.filter(p=>p.status==='PLAĆENO').reduce((a,p)=>a+Number(p.amount||0),0)}
+function groupCount(id){return state.clients.filter(c=>c.groupId===id&&!['ZAVRŠILA','OTKAZANA'].includes(c.status)).length}
+function saveToast(live,liveText,localText='Sačuvano lokalno. Drive nije povezan — deploy/povezivanje je neophodno za upis u tabelu.'){
+ showToast(live?liveText:localText);
+}
+
+
+function renderDashboard(){
+ const hot=state.leads.filter(l=>l.category==='HOT').length,waiting=state.leads.filter(l=>l.status==='WAITING LIST').length,qualified=state.leads.filter(l=>l.status==='KVALIFIKOVANA').length,offers=state.leads.filter(l=>l.status==='PONUDA POSLATA').length,paywait=state.leads.filter(l=>l.status==='ČEKA UPLATU').length;
+ const active=state.clients.filter(c=>['UPISANA','ONBOARDING','AKTIVNA','RENEWAL'].includes(c.status)).length;
+ const kpis=[
+  ['Leadovi',state.leads.length,'ukupna CRM baza','rose'],['HOT leadovi',hot,'prioritet za follow-up','red'],['Aktivni klijenti',active,'upisani / aktivni','sage'],['Ugovoreni prihod',money(contractedRevenue()),'vrednost programa','gold'],
+  ['Naplaćeno',money(paidRevenue()),'evidentirane uplate','plum'],['Email za proveru',state.emailQueue.filter(e=>e.status!=='POSLATO').length,'čeka finalnu proveru','lilac'],['Grupe',state.groups.length,'aktivne / planirane','rose'],['Programi',state.programs.filter(p=>p.active!==false).length,'katalog ponude','sage']
+ ];
+ dashboardKpis.innerHTML=kpis.map(x=>`<div class="dash-kpi ${x[3]}"><div class="dash-kpi-label">${x[0]}</div><div class="dash-kpi-value">${x[1]}</div><div class="dash-kpi-meta">${x[2]}</div></div>`).join('');
+ const warm=state.leads.filter(l=>l.category==='WARM').length,cold=state.leads.filter(l=>l.category==='COLD').length,totalQual=Math.max(1,hot+warm+cold);
+ qualificationSummary.innerHTML=`<div class="qual-stack"><span class="hot" style="width:${hot/totalQual*100}%"></span><span class="warm" style="width:${warm/totalQual*100}%"></span><span class="cold" style="width:${cold/totalQual*100}%"></span></div>
+ <div class="qual-legend"><div class="qual-legend-item"><b>${hot}</b><span>HOT • prioritet</span></div><div class="qual-legend-item"><b>${warm}</b><span>WARM • nurture / follow-up</span></div><div class="qual-legend-item"><b>${cold}</b><span>COLD • nizak prioritet</span></div></div>`;
+ const funnelData=[['Waiting list',waiting],['Kvalifikovani',qualified],['Ponuda poslata',offers],['Čeka uplatu',paywait],['Upisani',state.clients.filter(c=>c.status==='UPISANA').length]];
+ const max=Math.max(1,...funnelData.map(x=>x[1]));funnel.innerHTML=funnelData.map(x=>`<div class="funnel-row"><div class="funnel-label">${x[0]}</div><div class="funnel-track"><div class="funnel-fill" style="width:${Math.max(5,x[1]/max*100)}%"></div></div><div class="funnel-num">${x[1]}</div></div>`).join('');
+ const next=calendarEntries().map(e=>({...e,days:daysUntil(e.date)})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days).slice(0,6);
+ nextSteps.innerHTML=next.map(e=>`<div class="next-item"><div class="days-box ${e.days<=3?'urgent':e.days<=10?'soon':''}">${e.days}</div><div><b>${e.name}</b><small>${fmtDate(e.date)} • ${e.category||'CRM'} • ${e.owner||''}</small></div><span class="badge ${e.days<=3?'danger':e.days<=10?'gold':'gray'}">${e.days===0?'DANAS':e.days+' dana'}</span></div>`).join('')||'<div class="empty">Nema predstojećih koraka.</div>';
+ groupCapacity.innerHTML=state.groups.map(g=>{const n=groupCount(g.id),pct=g.capacity?Math.min(100,Math.round(n/g.capacity*100)):0;return `<div style="display:grid;grid-template-columns:220px 1fr 70px 120px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)"><div><b>${g.name}</b><div class="tiny">${programById(g.programId).name||'—'} • ${g.schedule||'—'}</div></div><div class="progressbar"><span style="width:${pct}%"></span></div><div style="font-weight:800">${n}/${g.capacity}</div><div>${money(n*Number(g.price||0))}</div></div>`}).join('');
+ 
+ const converted=state.clients.length, leadBase=Math.max(1,state.leads.length+converted);
+ const conversion=Math.min(100,Math.round(converted/leadBase*100));
+ const contracted=Math.max(1,contractedRevenue()), collection=Math.min(100,Math.round(paidRevenue()/contracted*100));
+ const groupsWithCap=state.groups.filter(g=>Number(g.capacity)>0);
+ const avgCap=groupsWithCap.length?Math.round(groupsWithCap.reduce((s,g)=>s+Math.min(100,groupCount(g.id)/Number(g.capacity)*100),0)/groupsWithCap.length):0;
+ operationalPulse.innerHTML=[
+   [conversion,'Lead → klijent','Konverzija CRM baze u klijente'],
+   [collection,'Naplata','Naplaćeno u odnosu na ugovoreni prihod'],
+   [avgCap,'Kapacitet','Prosečna popunjenost aktivnih / planiranih grupa']
+ ].map(x=>`<div class="pulse-metric"><div class="pulse-ring" style="--pct:${x[0]}"><b>${x[0]}%</b></div><div class="pulse-copy"><b>${x[1]}</b><p>${x[2]}</p></div></div>`).join('');
+ const activeRules=state.automationRules.filter(r=>r.on).length;
+ const next7=calendarEntries().filter(e=>{const d=daysUntil(e.date);return d>=0&&d<=7}).length;
+ const review=state.emailQueue.filter(e=>e.status!=='POSLATO').length;
+ automationHealth.innerHTML=`<span class="badge ok">${activeRules} aktivnih pravila</span><span class="badge gold">${next7} rokova u narednih 7 dana</span><span class="badge info">${review} emailova za proveru</span><span class="tiny">Pilot: rokovi se proveravaju dok je aplikacija otvorena.</span>`;
+
+ emailCountBadge.textContent=state.emailQueue.filter(e=>e.status!=='POSLATO').length;
+}
+
+function renderLeads(){
+ leadRows.innerHTML=state.leads.map(l=>{normalizeLeadQualification(l);const p=programById(l.programId),d=daysUntil(l.followup),manual=(l.qualificationOverride||'AUTO')!=='AUTO';return `<div class="crm-row">
+ <div class="crm-primary"><b>${l.name}</b><div class="contact-line">${l.email}${l.phone?' • '+l.phone:''}${l.instagram?' • '+l.instagram:''}</div><div class="interest-line">${p.name||'Bez programa'} • ${l.source||'—'}${l.campaign?' / '+l.campaign:''}</div></div>
+ <div class="qual-cell"><div class="qual-system">Predlog sistema: <b>${l.autoCategory}</b></div><select class="qual-select ${l.category.toLowerCase()} edit-control" ${canEdit()?'':'disabled'} onchange="changeLeadQualification('${l.id}',this.value)">${['AUTO','HOT','WARM','COLD'].map(s=>`<option value="${s}" ${(l.qualificationOverride||'AUTO')===s?'selected':''}>${s==='AUTO'?'Koristi predlog ('+l.autoCategory+')':s}</option>`).join('')}</select><span class="override-flag ${manual?'manual':'auto'}">${manual?'RUČNO':'AUTOMATSKI'}</span></div>
+ <div><select class="edit-control" ${canEdit()?'':'disabled'} onchange="changeLeadStatus('${l.id}',this.value)">${['WAITING LIST','KVALIFIKOVANA','PONUDA POSLATA','ČEKA UPLATU','UPISANA','NURTURE','IZGUBLJENA'].map(s=>`<option ${l.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+ <div class="crm-next"><b title="${l.nextStep||''}">${l.nextStep||'Nije definisan'}</b><span title="${l.goal||''}">${l.goal||'Cilj nije unet'}</span></div>
+ <div class="follow-date">${fmtDate(l.followup)}<small>${d==null?'Bez roka':d<0?Math.abs(d)+' dana kasni':d===0?'Danas':d+' dana'}</small></div>
+ <div class="crm-actions"><button class="btn small" onclick="openLeadDetail('${l.id}')">Detalji</button><button class="btn small" onclick="composeForLead('${l.id}')">Email</button><button class="admin-action btn small" onclick="convertLead('${l.id}')">Upiši</button></div>
+ </div>`}).join('');leadEmpty.style.display=state.leads.length?'none':'block';
+}
+
+const clientStatusInfo={
+ 'UPISANA':'Mesto je potvrđeno. Sledeći korak je onboarding.',
+ 'ONBOARDING':'Klijent je upisan, ali forma, dokumentacija ili logistika još nisu završeni.',
+ 'AKTIVNA':'Program je u toku. Prate se napredak i milestone-i.',
+ 'RENEWAL':'Period odluke o nastavku / sledećem nivou.',
+ 'ZAVRŠILA':'Program je završen; slede testimonial, preporuka ili alumni nurture.',
+ 'PAUZIRANA':'Privremeno pauzirana; razlog i plan nastavka evidentirati u profilu.',
+ 'OTKAZANA':'Upis / program je otkazan.'
+};
+function renderClients(){
+ clientRows.innerHTML=state.clients.map(c=>{const p=programById(c.programId),g=groupById(c.groupId);return `<div class="client-row">
+ <div class="client-cell-primary"><b>${c.name}</b><span>${c.email}${c.instagram?' • '+c.instagram:''}</span></div>
+ <div class="client-program"><b>${p.name||'—'}</b><span>${g.name||'Bez grupe'} • ${p.format||''}</span></div>
+ <div class="client-period"><b>${fmtDate(c.start)} → ${fmtDate(c.end)}</b><span>${money(c.value)} • ${c.paymentPlan||'—'}</span></div>
+ <div class="status-control"><select class="edit-control" ${canEdit()?'':'disabled'} onchange="changeClientStatus('${c.id}',this.value)">${['UPISANA','ONBOARDING','AKTIVNA','RENEWAL','ZAVRŠILA','PAUZIRANA','OTKAZANA'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select><span class="help-tip" data-tip="${clientStatusInfo[c.status]||'Status klijenta'}">?</span></div>
+ <div class="crm-next"><b title="${c.nextStep||''}">${c.nextStep||'Nije definisan'}</b><span title="${c.goal||''}">${c.goal||'Cilj nije unet'}</span></div>
+ <div class="client-actions"><button class="btn small" onclick="openClientProfile('${c.id}')">Profil</button><button class="btn small" onclick="composeForClient('${c.id}')">Email</button></div>
+ </div>`}).join('');
+}
+
+function renderEnrollments(){
+ enrollmentRows.innerHTML=state.enrollments.map(e=>{const c=clientById(e.clientId),p=programById(e.programId),g=groupById(e.groupId);return `<tr><td><b>${c.name||'—'}</b></td><td>${p.name||'—'}</td><td>${g.name||'—'}</td><td>${fmtDate(e.enrolled)}</td><td>${fmtDate(e.start)}</td><td>${fmtDate(e.end)}</td><td>${e.paymentPlan||'—'}</td><td>${badge(e.status)}</td></tr>`}).join('');
+}
+
+function renderPayments(){
+ paymentRows.innerHTML=state.payments.map(p=>{const c=clientById(p.clientId),d=daysUntil(p.due);return `<tr><td><b>${c.name||'—'}</b></td><td>${p.installment||'—'}</td><td>${money(p.amount)}</td><td>${fmtDate(p.due)}</td><td>${p.status==='PLAĆENO'?'—':badge(d<0?Math.abs(d)+' dana kasni':d+' dana')}</td><td>${badge(p.status)}</td><td>${fmtDate(p.paidDate)}</td></tr>`}).join('');
+}
+
+function renderGroups(){
+ groupRows.innerHTML=state.groups.map(g=>{const p=programById(g.programId),n=groupCount(g.id),pct=g.capacity?Math.round(n/g.capacity*100):0;return `<tr><td><b>${g.name}</b></td><td>${p.name||'—'}</td><td>${g.format}</td><td>${fmtDate(g.start)} → ${fmtDate(g.end)}</td><td>${g.schedule||'—'}</td><td>${g.capacity}</td><td>${n}</td><td>${pct}%</td><td>${money(n*Number(g.price||0))}</td></tr>`}).join('');
+}
+
+function calendarEntries(){
+ const out=[];
+ (state.calendarEvents||[]).forEach(e=>out.push({...e,source:'Ručni događaj',sourceMode:'manual'}));
+ (state.leads||[]).filter(l=>l.followup&&!['UPISANA','IZGUBLJENA'].includes(l.status)).forEach(l=>out.push({id:'CF-'+l.id,name:l.nextStep||('Follow-up: '+l.name),date:l.followup,time:'',category:'CRM',owner:l.name,action:'CRM follow-up za '+l.name,programId:l.programId,source:'CRM follow-up',sourceMode:'auto'}));
+ (state.payments||[]).filter(p=>p.due&&p.status!=='PLAĆENO').forEach(p=>{const c=clientById(p.clientId);out.push({id:'CP-'+p.id,name:'Rok uplate — '+(c.name||'Klijent'),date:p.due,time:'',category:'NAPLATA',owner:c.name||'',action:(p.installment||'Rata')+' • '+money(p.amount),programId:c.programId||'',source:'Uplate',sourceMode:'auto'})});
+ (state.groups||[]).forEach(g=>{if(g.start)out.push({id:'GS-'+g.id,name:'Početak grupe — '+g.name,date:g.start,time:'',category:'PROGRAM',owner:g.trainer||'Nataša',action:g.schedule||'Početak programa',programId:g.programId,source:'Program / grupa',sourceMode:'auto'});if(g.end)out.push({id:'GE-'+g.id,name:'Kraj grupe — '+g.name,date:g.end,time:'',category:'PROGRAM',owner:g.trainer||'Nataša',action:'Završetak ciklusa',programId:g.programId,source:'Program / grupa',sourceMode:'auto'})});
+ (state.clients||[]).filter(c=>c.end&&!['ZAVRŠILA','OTKAZANA'].includes(c.status)).forEach(c=>{const d=new Date(c.end+'T00:00:00');d.setDate(d.getDate()-30);const ds=d.toISOString().slice(0,10);out.push({id:'CR-'+c.id,name:'Renewal — '+c.name,date:ds,time:'',category:'RETENCIJA',owner:c.name,action:'Pripremiti nastavak / sledeći nivo',programId:c.programId,source:'Klijent / renewal',sourceMode:'auto'})});
+ const seen=new Set();return out.filter(e=>{const key=[e.name,e.date,e.owner].join('|');if(seen.has(key))return false;seen.add(key);return true});
+}
+function renderCalendar(){
+ const list=calendarEntries().filter(e=>e.date).sort((a,b)=>a.date.localeCompare(b.date));timeline.innerHTML=list.map(e=>{const d=daysUntil(e.date);return `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-card"><b>${e.name}</b><span class="source-badge ${e.sourceMode==='auto'?'auto':''}">${e.sourceMode==='auto'?'AUTO • ':''}${e.source}</span><p>${e.category} • ${e.action||'—'} • ${e.owner||'—'}</p><p>${fmtDate(e.date)}${e.time?' u '+e.time:''} • ${programById(e.programId).name||'—'}</p></div><div class="countdown ${d<=3?'urgent':d<=10?'soon':''}">${d<0?Math.abs(d)+' dana prošlo':d===0?'DANAS':d+' dana'}</div></div>`}).join('')||'<div class="empty">Nema kalendarskih događaja.</div>';
+}
+
+function renderProcess(){processFlow.innerHTML=[...state.processStages].sort((a,b)=>a.order-b.order).map((s,i)=>`<div class="stage-card"><div class="stage-num">${i+1}</div><h3>${s.name}</h3><p><b>${s.phase}</b></p><div class="stage-auto"><b>Automatizacija:</b><br/>${s.auto}</div><p style="margin-top:9px"><b>Ručna kontrola:</b> ${s.manual}</p><div class="stage-owner">Owner: ${s.owner}</div></div>`).join('')}
+
+function modeLabel(mode){return mode==='EVENT'?'EVENT':mode==='MILESTONE'?'MILESTONE':'SCHEDULED'}
+function triggerHuman(r){
+ const map={'NEW_LEAD':'Novi lead','LEAD_BECOMES_HOT':'Lead postaje HOT','STATUS:KVALIFIKOVANA':'Status → Kvalifikovana','STATUS:ČEKA UPLATU':'Status → Čeka uplatu','PAYMENT_DUE':'Približava se rok uplate','STATUS:UPISANA':'Status → Upisana','ONBOARDING_COMPLETE':'Onboarding kompletan','CALENDAR:ZOOM':'Zoom / kalendar','PROGRAM_MILESTONE':'30 / 60 / 90 dan','RENEWAL_DUE':'≤ 30 dana do kraja','PROGRAM_END':'Kraj programa','WEBINAR_D7':'7 dana do webinara','WEBINAR_D1':'1 dan do webinara','ALUMNI_NURTURE':'7 dana nakon završetka'};
+ return map[r.trigger]||r.trigger;
+}
+function renderAutomations(){
+ state.automationRules=normalizeAutomationRules(state.automationRules);
+ const total=state.automationRules.length;
+ const triggers=[
+  ['NEW_LEAD','Novi lead'],['LEAD_BECOMES_HOT','Lead postaje HOT'],['WEBINAR_D7','7 dana do webinara'],['WEBINAR_D1','1 dan do webinara'],
+  ['STATUS:KVALIFIKOVANA','Status → Kvalifikovana'],['STATUS:ČEKA UPLATU','Status → Čeka uplatu'],['PAYMENT_DUE','Rok uplate se približava'],
+  ['STATUS:UPISANA','Status → Upisana'],['ONBOARDING_COMPLETE','Onboarding završen'],['CALENDAR:ZOOM','Zoom / događaj iz kalendara'],
+  ['PROGRAM_MILESTONE','30 / 60 / 90 dan'],['RENEWAL_DUE','30 dana do kraja'],['PROGRAM_END','Kraj programa'],['ALUMNI_NURTURE','Alumni nurture']
+ ];
+ const forms=[['NO_FORM','Bez forme'],['FORM_OPTIONAL','Opciona forma'],['FORM_BEFORE_STATUS','Forma pre statusa'],['FORM_AFTER_STATUS','Forma posle statusa'],['FORM_AFTER_EMAIL','Forma posle emaila'],['SAMPLE_AFTER_EMAIL','Sample posle emaila']];
+ automationRows.innerHTML=state.automationRules.map((r,i)=>{
+   const positions=Array.from({length:total},(_,k)=>`<option value="${k+1}" ${r.order===k+1?'selected':''}>${k+1}</option>`).join('');
+   const mode=(r.mode||'EVENT').toLowerCase(),disabled=canEdit()?'':'disabled';
+   return `<div class="auto-card ${r.on?'':'off'}">
+    <div class="auto-step"><div class="switch ${r.on?'on':''}" onclick="toggleAutomation('${r.id}')" title="Uključi ili isključi ovo pravilo"></div>
+      <div><label>Pozicija <span class="help-tip" data-tip="Redosled izvršavanja. Ako izabereš zauzet broj, dva koraka automatski zamene pozicije.">?</span></label><select ${disabled} onchange="changeAutomationPosition('${r.id}',Number(this.value))">${positions}</select></div>
+    </div>
+    <div class="auto-title"><b>${r.name}</b><span>${r.phase||'PROCES'} • ${triggerHuman(r)}</span><span class="auto-mode ${mode}">${modeLabel(r.mode)}</span></div>
+    <div class="auto-field"><label>Okidač <span class="help-tip" data-tip="Događaj ili datum koji pokreće pravilo. Na primer: lead postaje HOT ili ostalo je 30 dana do kraja programa.">?</span></label><select ${disabled} onchange="updateAutomation('${r.id}','trigger',this.value)">${triggers.map(x=>`<option value="${x[0]}" ${r.trigger===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select></div>
+    <div class="auto-field"><label>Kašnjenje <span class="help-tip" data-tip="Koliko sistem čeka od okidača do pripreme sledeće akcije.">?</span></label><select ${disabled} onchange="updateAutomation('${r.id}','delay',Number(this.value))">
+      ${[[0,'Odmah'],[60,'1 sat'],[1440,'1 dan'],[4320,'3 dana'],[7200,'5 dana'],[10080,'7 dana']].map(x=>`<option value="${x[0]}" ${Number(r.delay)===x[0]?'selected':''}>${x[1]}</option>`).join('')}
+    </select></div>
+    <div class="auto-field"><label>Email / akcija <span class="help-tip" data-tip="Template emaila koji sistem priprema kada pravilo postane aktivno.">?</span></label><select ${disabled} onchange="updateAutomation('${r.id}','templateId',this.value)">${state.emailTemplates.map(t=>`<option value="${t.id}" ${t.id===r.templateId?'selected':''}>${t.name}</option>`).join('')}</select></div>
+    <div class="auto-field"><label>Forma <span class="help-tip" data-tip="Određuje da li se forma šalje pre ili posle emaila / promene statusa.">?</span></label><select ${disabled} onchange="updateAutomation('${r.id}','formTiming',this.value)">${forms.map(x=>`<option value="${x[0]}" ${x[0]===r.formTiming?'selected':''}>${x[1]}</option>`).join('')}</select></div>
+    <div class="auto-field"><label>Finalna provera <span class="help-tip" data-tip="DA znači da vlasnica prvo pregleda primaoce i tekst. NE je namenjeno samo bezbednim sistemskim porukama.">?</span></label><select ${disabled} onchange="updateAutomation('${r.id}','review',this.value==='true')"><option value="true" ${r.review?'selected':''}>DA</option><option value="false" ${!r.review?'selected':''}>NE</option></select></div>
+    <div class="auto-controls"><button class="icon-btn" ${disabled} onclick="moveAutomation('${r.id}',-1)" ${i===0?'disabled':''}>↑</button><button class="icon-btn" ${disabled} onclick="moveAutomation('${r.id}',1)" ${i===total-1?'disabled':''}>↓</button></div>
+   </div>`;
+ }).join('');
+}
+
+async function refreshServerHealth(){
+ const el=document.getElementById('serverHealth');if(!el)return;
+ let hosted=isAppsScriptHosted(),scheduler=false,last='';
+ try{
+  let res;
+  if(hosted)res=await callAppsScript('apiStatus',[currentUser?.sessionToken||'']);
+  else if(apiUrl()){const r=await fetch(apiUrl()+'?action=status&sessionToken='+encodeURIComponent(currentUser?.sessionToken||''));res=await r.json()}
+  if(res&&res.ok){scheduler=!!res.schedulerInstalled;last=res.lastBackup||''}
+ }catch(e){}
+ el.innerHTML=`<span class="badge ${hosted?'ok':'gold'}">Hosting: ${hosted?'Apps Script Web App':'Vercel / browser'}</span><span class="badge ${driveAvailable()?'ok':'danger'}">Direktni upis: ${driveAvailable()?'SPREMAN':'NIJE POVEZAN'}</span><span class="badge ${scheduler?'ok':'gray'}">24/7 automatizacija: ${scheduler?'UKLJUČENA':'nije uključena'}</span><span class="badge ok">Backup: Google Sheet${last?' • '+last:''}</span>`;
+}
+function renderSettings(){apiUrl.value=state.settings.apiUrl||DEFAULT_BACKEND_URL||'';ownerEmail.value=state.settings.ownerEmail||'';onboardingUrl.value=state.settings.onboardingUrl||'';renewalUrl.value=state.settings.renewalUrl||'';sampleUrl.value=state.settings.sampleUrl||'';[apiUrl,ownerEmail,onboardingUrl,renewalUrl,sampleUrl].forEach(x=>x.disabled=!canEdit());setDriveStatus(isAppsScriptHosted()||apiUrl()?'ok':'off',isAppsScriptHosted()?'Drive: Apps Script hosting':apiUrl()?'Drive: povezan':'Drive: nije povezan');setTimeout(refreshServerHealth,20)}
+function renderSelects(){
+ const programOpts=state.programs.filter(p=>p.active!==false).map(p=>`<option value="${p.id}">${p.name} — ${p.format}</option>`).join('');
+ ['leadProgram','clientProgram','groupProgram','calProgram'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=programOpts});
+ clientGroup.innerHTML='<option value="">Bez grupe</option>'+state.groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+ paymentClient.innerHTML=state.clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+ const available=state.leads.filter(l=>!state.clients.some(c=>c.leadId===l.id));
+ clientLeadSelect.innerHTML='<option value="">Izaberi lead</option>'+available.map(l=>`<option value="${l.id}">${l.name} — ${l.category} — ${l.status}</option>`).join('');
+}
+function renderEmailQueue(){
+ emailQueueList.innerHTML=state.emailQueue.length?state.emailQueue.map(e=>`<div style="display:grid;grid-template-columns:1fr 140px 90px 260px;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)"><div><b>${e.subject}</b><div class="tiny">${e.recipients.join(', ')}</div></div><div>${badge(e.status)}</div><div>${e.created?new Date(e.created).toLocaleDateString('sr-RS'):'—'}</div><div><button class="btn small" onclick="openQueuedGmail('${e.id}')">Gmail</button> <button class="btn small" onclick="markEmailSent('${e.id}')">Poslato</button> <button class="btn small" onclick="removeQueued('${e.id}')">Obriši</button></div></div>`).join(''):'<div class="empty">Nema emailova u redu za proveru.</div>';
+}
+
+function renderGuide(){
+ const forms=[
+  {name:'Waiting lista / predupis',phase:'MARKETING / CRM',when:'Posle CTA sa Instagrama, vodiča ili webinara',url:'https://forms.gle/385XQJ98PpNf5cTXA',status:'AKTIVNA'},
+  {name:'Prijava za webinar',phase:'NURTURE',when:'7 dana i 1 dan pre webinara — samo ako je posebna registracija potrebna',url:'',status:'TBD'},
+  {name:'Onboarding: ugovor, saglasnost i upitnici',phase:'ONBOARDING',when:'Nakon potvrđene uplate / statusa UPISANA',url:state.settings.onboardingUrl||'',status:state.settings.onboardingUrl?'AKTIVNA':'TBD'},
+  {name:'Progress check 30 / 60 / 90',phase:'PROGRAM / RETENCIJA',when:'30., 60. i 90. dan programa',url:'',status:'TBD'},
+  {name:'Renewal / izbor sledećeg nivoa',phase:'RETENCIJA',when:'30 dana pre kraja ciklusa',url:state.settings.renewalUrl||'',status:state.settings.renewalUrl?'AKTIVNA':'TBD'},
+  {name:'Testimonial / preporuka',phase:'LOYALTY',when:'Po završetku ciklusa ili nakon jasnog rezultata',url:'',status:'TBD'},
+  {name:'Sample trening / video',phase:'KVALIFIKACIJA',when:'Po potrebi, nakon kvalifikacije HOT / WARM leada',url:state.settings.sampleUrl||'',status:state.settings.sampleUrl?'AKTIVAN':'TBD',notForm:true}
+ ];
+ const el=document.getElementById('guideForms'); if(!el)return;
+ el.innerHTML=forms.map(f=>`<div class="form-row">
+   <div><b>${f.name}</b><div class="tiny">${f.phase}</div></div>
+   <div><span>${f.when}</span></div>
+   <div><span>${f.url?`<a href="${f.url}" target="_blank" rel="noopener">${f.notForm?'Otvori sadržaj':'Otvori formu'}</a>`:'Link nije definisan'}</span></div>
+   <div>${badge(f.status)}</div>
+ </div>`).join('');
+}
+
+function renderAll(){state.automationRules=normalizeAutomationRules(state.automationRules);renderDashboard();renderLeads();renderClients();renderEnrollments();renderPayments();renderGroups();renderCalendar();renderProcess();renderAutomations();renderSettings();renderSelects();renderEmailQueue();renderGuide();emailCountBadge.textContent=state.emailQueue.filter(e=>e.status!=='POSLATO').length}
+
+function openLeadModal(){if(!requireAdmin())return;renderSelects();openModal('leadModal')}
+function openClientModal(){if(!requireAdmin())return;renderSelects();toggleClientMode();openModal('clientModal')}
+function openPaymentModal(){if(!requireAdmin())return;renderSelects();openModal('paymentModal')}
+function openGroupModal(){if(!requireAdmin())return;renderSelects();openModal('groupModal')}
+function openCalendarModal(){if(!requireAdmin())return;renderSelects();openModal('calendarModal')}
+
+async function saveLead(){if(!requireAdmin())return;
+ const name=leadName.value.trim(),email=leadEmail.value.trim();if(!name||!email)return showToast('Unesi ime i email');
+ const l={id:uid('L'),name,email,phone:leadPhone.value.trim(),instagram:leadInstagram.value.trim(),source:leadSource.value,campaign:leadCampaign.value.trim(),format:leadFormat.value,programId:leadProgram.value,slot:leadSlot.value.trim(),price:leadPrice.value,intent:leadIntent.value,goal:leadGoal.value.trim(),challenge:leadChallenge.value.trim(),comms:leadComms.value,followup:leadFollowup.value,note:leadNote.value.trim(),status:'WAITING LIST',nextStep:'Prvi follow-up',created:new Date().toISOString().slice(0,10)};
+ l.score=calcLeadScore(l);l.autoCategory=leadCategory(l.score);l.qualificationOverride='AUTO';l.category=l.autoCategory;state.leads.unshift(l);autoQueueFor(l,'NEW_LEAD','lead');if(l.category==='HOT')autoQueueFor(l,'LEAD_BECOMES_HOT','lead');await saveState();const live=await directUpsert('lead',l);closeModal('leadModal');saveToast(live,'Novi lead je odmah dodat u Leadovi tabelu')
+}
+function toggleClientMode(){const crm=clientMode.value==='crm';crmLeadWrap.style.display=crm?'flex':'none';[clientName,clientEmail,clientPhone,clientInstagram].forEach(x=>x.disabled=crm);if(!crm){clientLeadSelect.value='';clientName.value='';clientEmail.value='';clientPhone.value='';clientInstagram.value=''}}
+function applyLeadToClient(){const l=leadById(clientLeadSelect.value);if(!l)return;clientName.value=l.name;clientEmail.value=l.email;clientPhone.value=l.phone||'';clientInstagram.value=l.instagram||'';clientProgram.value=l.programId||state.programs[0].id;clientGoal.value=l.goal||'';clientFocus.value=l.challenge||'';applyProgramDefaults()}
+function applyProgramDefaults(){const p=programById(clientProgram.value);if(p.start)clientStart.value=p.start;if(p.end)clientEnd.value=p.end;if(p.price!=='')clientValue.value=p.price;const best=state.groups.find(g=>g.programId===p.id&&g.status!=='ZAVRŠENA');if(best)clientGroup.value=best.id}
+function convertLead(id){renderSelects();clientMode.value='crm';toggleClientMode();clientLeadSelect.value=id;applyLeadToClient();openModal('clientModal')}
+async function saveClient(){if(!requireAdmin())return;
+ const name=clientName.value.trim(),email=clientEmail.value.trim();if(!name||!email)return showToast('Unesi ime i email');
+ const leadId=clientMode.value==='crm'?clientLeadSelect.value:'';
+ const c={id:uid('C'),leadId,name,email,phone:clientPhone.value.trim(),instagram:clientInstagram.value.trim(),groupId:clientGroup.value,programId:clientProgram.value,status:clientStatus.value,start:clientStart.value,end:clientEnd.value,value:Number(clientValue.value||0),paymentPlan:clientPaymentPlan.value,source:leadId?(leadById(leadId).source||'CRM'):'Ručni unos',created:new Date().toISOString().slice(0,10),goal:clientGoal.value.trim(),focus:clientFocus.value.trim(),onboarding:clientStatus.value==='UPISANA'?'ČEKA':'U TOKU',renewalStatus:'NIJE POKRENUT',nextStep:clientStatus.value==='UPISANA'?'Završiti onboarding':'Naredni korak programa',owner:'Nataša',note:leadId?'Konvertovan iz CRM-a':'Ručni unos'};
+ state.clients.unshift(c);state.enrollments.unshift({id:uid('ENR'),clientId:c.id,groupId:c.groupId,programId:c.programId,status:c.status==='AKTIVNA'?'AKTIVAN':c.status,enrolled:c.created,start:c.start,end:c.end,amount:c.value,paymentPlan:c.paymentPlan});
+ if(leadId){const l=leadById(leadId);l.status='UPISANA';l.nextStep='Onboarding';}
+ autoQueueFor(c,'STATUS:UPISANA','client');await saveState();
+ const enr=state.enrollments[0],items=[{entityType:'client',entity:c},{entityType:'enrollment',entity:enr}];
+ if(leadId)items.push({entityType:'lead',entity:leadById(leadId)});
+ const live=await directBatchUpsert(items);closeModal('clientModal');saveToast(live,'Klijent, upis i CRM status su odmah upisani u Google Sheet');
+}
+async function savePayment(){if(!requireAdmin())return;if(!paymentClient.value)return showToast('Izaberi klijenta');const p={id:uid('P'),clientId:paymentClient.value,installment:paymentInstallment.value,amount:Number(paymentAmount.value||0),due:paymentDue.value,status:paymentStatus.value,paidDate:paymentDate.value};state.payments.unshift(p);await saveState();const live=await directUpsert('payment',p);closeModal('paymentModal');saveToast(live,'Uplata je odmah dodata u Uplate tabelu')}
+async function saveGroup(){if(!requireAdmin())return;const p=programById(groupProgram.value);const g={id:uid('G'),name:groupName.value.trim()||p.name,programId:p.id,format:groupFormat.value,start:groupStart.value,end:groupEnd.value,schedule:groupSchedule.value.trim(),capacity:Number(groupCapacityInput.value||p.capacity||8),price:Number(groupPrice.value||p.price||0),status:'UPIS OTVOREN'};state.groups.unshift(g);await saveState();const live=await directUpsert('group',g);closeModal('groupModal');saveToast(live,'Grupa je odmah dodata u Grupe tabelu')}
+async function saveCalendarEvent(){if(!requireAdmin())return;if(!calName.value.trim()||!calDate.value)return showToast('Unesi naziv i datum');const e={id:uid('CAL'),category:calCategory.value,name:calName.value.trim(),date:calDate.value,time:calTime.value,audience:'',programId:calProgram.value,action:calAction.value.trim(),templateId:'',owner:calOwner.value.trim()};state.calendarEvents.push(e);await saveState();const live=await directUpsert('calendar',e);closeModal('calendarModal');saveToast(live,'Događaj je odmah dodat u Kalendar tabelu')}
+
+async function changeLeadStatus(id,status){if(!requireAdmin())return;const l=leadById(id);if(!l)return;l.status=status;if(status==='ČEKA UPLATU')l.nextStep='Instrukcije za uplatu';else if(status==='UPISANA')l.nextStep='Onboarding';autoQueueFor(l,'STATUS:'+status,'lead');await saveState();const live=await directUpsert('lead',l);saveToast(live,'Status leada je odmah upisan u Leadovi tabelu')}
+async function changeClientStatus(id,status){if(!requireAdmin())return;const c=clientById(id);if(!c)return;c.status=status;if(status==='RENEWAL')c.nextStep='Renewal ponuda';autoQueueFor(c,'STATUS:'+status,'client');await saveState();const live=await directUpsert('client',c);saveToast(live,'Status klijenta je odmah upisan u Klijenti tabelu')}
+async function install24x7Automation(){
+ if(!requireAdmin())return;
+ try{
+   let res;
+   if(isAppsScriptHosted())res=await callAppsScript('apiInstallAutomation',[currentUser?.sessionToken||'']);
+   else if(apiUrl()){
+     const r=await fetch(apiUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'installTrigger',sessionToken:currentUser?.sessionToken||''})});res=await r.json();
+   }else return showToast('24/7 automatizacija zahteva Apps Script backend');
+   if(!res||!res.ok)throw new Error(res&&res.error?res.error:'Aktivacija nije uspela');
+   showToast('24/7 proveravanje rokova je uključeno');
+   refreshServerHealth();
+ }catch(e){showToast('Automatizacija: '+e.message)}
+}
+async function toggleAutomation(id){if(!requireAdmin())return;const r=state.automationRules.find(x=>x.id===id);if(r){r.on=!r.on;await saveState();await directUpsert('automation',r)}}
+async function changeAutomationPosition(id,newPos){if(!requireAdmin())return;
+ state.automationRules=normalizeAutomationRules(state.automationRules);
+ const current=state.automationRules.find(r=>r.id===id);if(!current)return;
+ newPos=Math.max(1,Math.min(state.automationRules.length,Number(newPos)||current.order));
+ if(newPos===current.order)return;
+ const target=state.automationRules.find(r=>r.order===newPos);
+ const old=current.order;
+ current.order=newPos;
+ if(target)target.order=old;
+ state.automationRules=normalizeAutomationRules(state.automationRules);
+ await saveState();await directBatchUpsert(state.automationRules.map(x=>({entityType:'automation',entity:x})));
+ showToast(`Korak ${old} i korak ${newPos} su zamenjeni i upisani u tabelu`);
+}
+async function moveAutomation(id,delta){if(!requireAdmin())return;
+ state.automationRules=normalizeAutomationRules(state.automationRules);
+ const r=state.automationRules.find(x=>x.id===id);if(!r)return;
+ await changeAutomationPosition(id,r.order+delta);
+}
+async function resetAutomationOrder(){if(!requireAdmin())return;
+ const current=new Map(state.automationRules.map(r=>[r.id,r]));
+ state.automationRules=clone(defaultAutomations).map(d=>({...d,...(current.get(d.id)||{}),order:d.order,phase:d.phase,mode:d.mode}));
+ await saveState();await directBatchUpsert(state.automationRules.map(x=>({entityType:'automation',entity:x})));showToast('Vraćen je preporučeni redosled i upisan u tabelu');
+}
+async function updateAutomation(id,key,val){if(!requireAdmin())return;const r=state.automationRules.find(x=>x.id===id);if(!r)return;r[key]=(key==='delay')?Number(val):val;await saveState();await directUpsert('automation',r)}
+
+function autoQueueFor(person,trigger,type){
+ const rules=state.automationRules.filter(r=>r.on&&r.trigger===trigger);for(const r of rules){const t=state.emailTemplates.find(x=>x.id===r.templateId);if(!t)continue;const body=mergeTemplate(t.body,person);state.emailQueue.unshift({id:uid('E'),recipients:[person.email],to:[person.email],cc:[],bcc:[],subject:mergeTemplate(t.subject,person),body,status:'ZA PROVERU',created:new Date().toISOString(),templateId:t.id,trigger,type,personId:person.id})}
+}
+function mergeTemplate(txt,p){const first=(p.name||'').split(' ')[0];return String(txt||'').replaceAll('{{ime}}',first).replaceAll('{{form_link}}',state.settings.onboardingUrl||'').replaceAll('{{cta}}',state.settings.sampleUrl||'').replaceAll('{{next_program}}','LBD Evolve / sledeći nivo').replaceAll('{{payment_info}}','Instrukcije za uplatu se unose u finalnoj verziji.')}
+
+function segments(){
+ return {
+  'HOT':state.leads.filter(l=>l.category==='HOT'),
+  'WARM':state.leads.filter(l=>l.category==='WARM'),
+  'COLD':state.leads.filter(l=>l.category==='COLD'),
+  'ČEKA UPLATU':state.leads.filter(l=>l.status==='ČEKA UPLATU'),
+  'ONBOARDING':state.clients.filter(c=>c.status==='ONBOARDING'||c.onboarding==='U TOKU'||c.onboarding==='ČEKA'),
+  'RENEWAL':state.clients.filter(c=>c.status==='RENEWAL'||c.renewalStatus==='PLANIRANO'),
+  'AKTIVNI KLIJENTI':state.clients.filter(c=>c.status==='AKTIVNA'),
+  'SVE LEAD':state.leads
+ }
+}
+function prepareEmailCenter(){
+ mailSegment.innerHTML=Object.keys(segments()).map(s=>`<option>${s}</option>`).join('');
+ mailTemplateSelect.innerHTML=state.emailTemplates.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+ refreshComposerRecipients();loadSelectedTemplate();renderEmailQueue()
+}
+function insertMailLink(){
+ const link=(mailLink.value||'').trim();if(!link)return showToast('Prvo unesi link / formu');const ta=mailBody;const start=ta.selectionStart??ta.value.length,end=ta.selectionEnd??ta.value.length;const prefix=ta.value.slice(0,start),suffix=ta.value.slice(end);const add=(prefix&&!prefix.endsWith('\n')?'\n\n':'')+link;ta.value=prefix+add+suffix;ta.focus();ta.selectionStart=ta.selectionEnd=(prefix+add).length;
+}
+function composedMailBody(){const link=(mailLink.value||'').trim(),body=mailBody.value||'';return link&&body.indexOf(link)<0?body+'\n\n'+link:body}
+function refreshComposerRecipients(){
+ const arr=segments()[mailSegment.value]||[];
+ const mode=mailMode.value||'all_bcc';
+ mailRecipients.innerHTML=arr.map((x,i)=>{
+   let role='BCC';
+   if(mode==='all_to')role='TO';else if(mode==='all_cc')role='CC';
+   else if(mode==='first_to_rest_bcc')role=i===0?'TO':'BCC';
+   else if(mode==='first_to_rest_cc')role=i===0?'TO':'CC';
+   const disabled=mode!=='custom'?'disabled':'';
+   return `<label class="recipient-option"><input type="checkbox" class="mail-rec" value="${x.email}" checked/><span><b>${x.name}</b><br/><span class="tiny">${x.email}</span></span><select class="mail-role" ${disabled}><option ${role==='TO'?'selected':''}>TO</option><option ${role==='CC'?'selected':''}>CC</option><option ${role==='BCC'?'selected':''}>BCC</option></select></label>`;
+ }).join('')||'<div class="tiny">Nema kontakata u segmentu.</div>';
+ const many=arr.length>1;
+ mailPrivacyNote.innerHTML=mode==='all_bcc'||mode==='first_to_rest_bcc'?'<b>Privatnost:</b> BCC skriva email adrese drugih primalaca.':many?'<b>Napomena:</b> TO i CC prikazuju adrese drugim primaocima. Za mailing listu je BCC sigurnija opcija.':'Izaberi TO, CC ili BCC prema načinu komunikacije.';
+}
+function loadSelectedTemplate(){const t=state.emailTemplates.find(x=>x.id===mailTemplateSelect.value)||state.emailTemplates[0];if(!t)return;mailSubject.value=t.subject;mailBody.value=t.body}
+function selectedMailAssignments(){
+ const rows=[...document.querySelectorAll('.mail-rec:checked')].map(ch=>{
+   const row=ch.closest('.recipient-option');const role=row?.querySelector('.mail-role')?.value||'BCC';return {email:ch.value,role};
+ });
+ return {to:rows.filter(x=>x.role==='TO').map(x=>x.email),cc:rows.filter(x=>x.role==='CC').map(x=>x.email),bcc:rows.filter(x=>x.role==='BCC').map(x=>x.email)};
+}
+function selectedMailRecipients(){const a=selectedMailAssignments();return [...a.to,...a.cc,...a.bcc]}
+async function saveTemplateChanges(){if(!requireAdmin())return;const t=state.emailTemplates.find(x=>x.id===mailTemplateSelect.value);if(!t)return;t.subject=mailSubject.value;t.body=mailBody.value;await saveState();const live=await directUpsert('template',t);saveToast(live,'Template je odmah sačuvan u EmailTemplates tabeli')}
+async function queueCurrentEmail(){if(!requireAdmin())return;const a=selectedMailAssignments(),rec=[...a.to,...a.cc,...a.bcc];if(!rec.length)return showToast('Izaberi primaoce');const e={id:uid('E'),recipients:rec,to:a.to,cc:a.cc,bcc:a.bcc,subject:mailSubject.value,body:composedMailBody(),status:'ZA PROVERU',created:new Date().toISOString(),note:mailNote.value};state.emailQueue.unshift(e);await saveState();const live=await directUpsert('email',e);saveToast(live,'Email queue je odmah upisan u tabelu')}
+function openCurrentGmail(){if(!requireAdmin())return;const a=selectedMailAssignments();if(![...a.to,...a.cc,...a.bcc].length)return showToast('Izaberi primaoce');openGmail(a,mailSubject.value,composedMailBody())}
+function openBulkComposer(segment){goPage('emailCenter');setTimeout(()=>{mailSegment.value=segment;refreshComposerRecipients();const t=state.emailTemplates.find(x=>x.id==='TPL-HOT-01');if(t){mailTemplateSelect.value=t.id;loadSelectedTemplate()}},50)}
+function composeForLead(id){const l=leadById(id);goPage('emailCenter');setTimeout(()=>{mailRecipients.innerHTML=`<label class="recipient-option"><input type="checkbox" class="mail-rec" value="${l.email}" checked/><span><b>${l.name}</b><br/><span class="tiny">${l.email}</span></span><select class="mail-role"><option selected>TO</option><option>CC</option><option>BCC</option></select></label>`;const t=state.emailTemplates.find(x=>x.id==='TPL-HOT-01');mailSubject.value=mergeTemplate(t.subject,l);mailBody.value=mergeTemplate(t.body,l)},50)}
+
+function openLeadDetail(id){
+ const l=leadById(id);if(!l)return;const p=programById(l.programId);normalizeLeadQualification(l);const d=daysUntil(l.followup);
+ client360Name.textContent=l.name;client360Subtitle.textContent=`CRM lead • ${l.category} • ${l.status}`;
+ client360Body.innerHTML=`<div class="client360-grid" style="margin-top:16px"><div class="client360-card"><h4>Kontakt</h4><p><b>Email:</b> ${l.email||'—'}</p><p><b>Telefon:</b> ${l.phone||'—'}</p><p><b>Instagram:</b> ${l.instagram||'—'}</p><p><b>Izvor:</b> ${l.source||'—'} / ${l.campaign||'—'}</p></div><div class="client360-card"><h4>Interesovanje</h4><p><b>Program:</b> ${p.name||'—'}</p><p><b>Format:</b> ${l.format||'—'}</p><p><b>Termin:</b> ${l.slot||'—'}</p><p><b>Komunikacija:</b> ${l.comms||'—'}</p></div><div class="client360-card"><h4>Kvalifikacija</h4><p><b>Score:</b> ${l.score}</p><p><b>Predlog sistema:</b> ${l.autoCategory}</p><p><b>Konačno:</b> ${l.category} • ${(l.qualificationOverride||'AUTO')==='AUTO'?'automatski':'ručno promenjeno'}</p></div><div class="client360-card"><h4>Sledeći korak</h4><p><b>${l.nextStep||'Nije definisan'}</b></p><p>Follow-up: ${fmtDate(l.followup)} ${d!=null?'('+ (d<0?Math.abs(d)+' dana kasni':d===0?'danas':d+' dana') +')':''}</p></div></div><div class="client360-card" style="margin-top:13px"><h4>Cilj i izazov</h4><p><b>Cilj:</b> ${l.goal||'—'}</p><p><b>Izazov:</b> ${l.challenge||'—'}</p><p><b>Napomena:</b> ${l.note||'—'}</p></div>`;openModal('client360Modal');
+}
+function openClientProfile(id){
+ const c=clientById(id);if(!c)return;
+ const p=programById(c.programId),g=groupById(c.groupId),payments=state.payments.filter(x=>x.clientId===id);
+ const paid=payments.filter(x=>x.status==='PLAĆENO').reduce((s,x)=>s+Number(x.amount||0),0);
+ const outstanding=Math.max(0,Number(c.value||0)-paid);
+ const renewalDate=c.end?new Date(new Date(c.end+'T00:00:00').getTime()-30*86400000).toISOString().slice(0,10):'';
+ const daysRenewal=daysUntil(renewalDate);
+ client360Name.textContent=c.name;
+ client360Subtitle.textContent=`${p.name||'Program nije izabran'} • ${g.name||'Bez grupe'} • ${c.status} • ${canEdit()?'ADMIN može da menja':'VIEWER — samo pregled'}`;
+ const events=[];
+ if(c.created)events.push([c.created,'Upis evidentiran']);if(c.start)events.push([c.start,'Početak programa']);
+ payments.forEach(x=>events.push([x.paidDate||x.due,`${x.installment} • ${x.status} • ${money(x.amount)}`]));
+ if(renewalDate)events.push([renewalDate,'Početak renewal perioda']);if(c.end)events.push([c.end,'Kraj programa']);
+ events.sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+ const readOnly=`<div class="client360-grid" style="margin-top:16px">
+   <div class="client360-card"><h4>Profil i cilj</h4><p><b>Email:</b> ${c.email||'—'}</p><p><b>Telefon:</b> ${c.phone||'—'}</p><p><b>Instagram:</b> ${c.instagram||'—'}</p><p><b>Cilj:</b> ${c.goal||'—'}</p><p><b>Fokus:</b> ${c.focus||'—'}</p></div>
+   <div class="client360-card"><h4>Program</h4><p><b>Program:</b> ${p.name||'—'}</p><p><b>Grupa:</b> ${g.name||'—'}</p><p><b>Period:</b> ${fmtDate(c.start)} → ${fmtDate(c.end)}</p><p><b>Onboarding:</b> ${c.onboarding||'—'}</p></div>
+   <div class="client360-card"><h4>Finansije</h4><p><b>Vrednost:</b> ${money(c.value)}</p><p><b>Naplaćeno:</b> ${money(paid)}</p><p><b>Preostalo:</b> ${money(outstanding)}</p><p><b>Plan:</b> ${c.paymentPlan||'—'}</p></div>
+   <div class="client360-card"><h4>Sledeći korak</h4><p><b>${c.nextStep||'Nije definisan'}</b></p><p>Renewal: ${renewalDate?fmtDate(renewalDate):'—'} ${daysRenewal!=null?`(${daysRenewal>=0?daysRenewal+' dana':'rok prošao'})`:''}</p>${canEdit()?`<div style="margin-top:9px"><button class="btn small" onclick="renderClientEdit('${c.id}')">Izmeni profil</button> <button class="btn small" onclick="closeModal('client360Modal');composeForClient('${c.id}')">Pripremi email</button></div>`:''}</div>
+ </div>
+ <div class="client360-card" style="margin-top:13px"><h4>Timeline klijenta</h4><div class="client360-timeline">${events.map(e=>`<div class="client360-event"><b>${fmtDate(e[0])}</b><span>${e[1]}</span></div>`).join('')}</div></div>`;
+ client360Body.innerHTML=readOnly;openModal('client360Modal');
+}
+function renderClientEdit(id){
+ if(!requireAdmin())return;const c=clientById(id);if(!c)return;
+ client360Body.innerHTML=`<div class="profile-edit-grid">
+  <div class="field"><label>Ime i prezime</label><input id="pName" value="${c.name||''}"/></div>
+  <div class="field"><label>Email</label><input id="pEmail" value="${c.email||''}"/></div>
+  <div class="field"><label>Telefon</label><input id="pPhone" value="${c.phone||''}"/></div>
+  <div class="field"><label>Instagram</label><input id="pInstagram" value="${c.instagram||''}"/></div>
+  <div class="field"><label>Program</label><select id="pProgram">${state.programs.map(p=>`<option value="${p.id}" ${p.id===c.programId?'selected':''}>${p.name} — ${p.format}</option>`).join('')}</select></div>
+  <div class="field"><label>Grupa</label><select id="pGroup"><option value="">Bez grupe</option>${state.groups.map(g=>`<option value="${g.id}" ${g.id===c.groupId?'selected':''}>${g.name}</option>`).join('')}</select></div>
+  <div class="field"><label>Status</label><select id="pStatus">${['UPISANA','ONBOARDING','AKTIVNA','RENEWAL','ZAVRŠILA','PAUZIRANA','OTKAZANA'].map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}</select></div>
+  <div class="field"><label>Onboarding</label><select id="pOnboarding">${['ČEKA','U TOKU','ZAVRŠEN'].map(s=>`<option ${s===c.onboarding?'selected':''}>${s}</option>`).join('')}</select></div>
+  <div class="field"><label>Početak</label><input id="pStart" type="date" value="${c.start||''}"/></div>
+  <div class="field"><label>Kraj</label><input id="pEnd" type="date" value="${c.end||''}"/></div>
+  <div class="field"><label>Vrednost (€)</label><input id="pValue" type="number" value="${c.value||0}"/></div>
+  <div class="field"><label>Plan plaćanja</label><input id="pPlan" value="${c.paymentPlan||''}"/></div>
+  <div class="field full"><label>Glavni cilj</label><input id="pGoal" value="${c.goal||''}"/></div>
+  <div class="field full"><label>Fokus klijenta</label><input id="pFocus" value="${c.focus||''}"/></div>
+  <div class="field full"><label>Sledeći korak</label><input id="pNext" value="${c.nextStep||''}"/></div>
+ </div><div class="profile-edit-actions"><button class="btn" onclick="openClientProfile('${id}')">Otkaži</button><button class="btn primary" onclick="saveClientProfile('${id}')">Sačuvaj izmene</button></div>`;
+}
+async function saveClientProfile(id){
+ if(!requireAdmin())return;const c=clientById(id);if(!c)return;
+ Object.assign(c,{name:pName.value.trim(),email:pEmail.value.trim(),phone:pPhone.value.trim(),instagram:pInstagram.value.trim(),programId:pProgram.value,groupId:pGroup.value,status:pStatus.value,onboarding:pOnboarding.value,start:pStart.value,end:pEnd.value,value:Number(pValue.value||0),paymentPlan:pPlan.value.trim(),goal:pGoal.value.trim(),focus:pFocus.value.trim(),nextStep:pNext.value.trim()});
+ await saveState();const live=await directUpsert('client',c);saveToast(live,'Profil klijenta je odmah izmenjen u Klijenti tabeli');openClientProfile(id);
+}
+
+function composeForClient(id){const c=clientById(id);goPage('emailCenter');setTimeout(()=>{mailRecipients.innerHTML=`<label class="recipient-option"><input type="checkbox" class="mail-rec" value="${c.email}" checked/><span><b>${c.name}</b><br/><span class="tiny">${c.email}</span></span><select class="mail-role"><option selected>TO</option><option>CC</option><option>BCC</option></select></label>`;const t=state.emailTemplates.find(x=>x.id==='TPL-REN-01');mailSubject.value=mergeTemplate(t.subject,c);mailBody.value=mergeTemplate(t.body,c)},50)}
+function openGmail(assignments,subject,body){
+ const a=Array.isArray(assignments)?{to:assignments,cc:[],bcc:[]}:assignments;
+ const params=new URLSearchParams({view:'cm',fs:'1',su:subject||'',body:body||''});
+ if(a.to?.length)params.set('to',a.to.join(','));
+ if(a.cc?.length)params.set('cc',a.cc.join(','));
+ if(a.bcc?.length)params.set('bcc',a.bcc.join(','));
+ window.open('https://mail.google.com/mail/?'+params.toString(),'_blank','noopener');
+}
+function openQueuedGmail(id){const e=state.emailQueue.find(x=>x.id===id);if(e)openGmail({to:e.to||((e.recipients||[]).length===1?e.recipients:[]),cc:e.cc||[],bcc:e.bcc||((e.recipients||[]).length>1?e.recipients:[])},e.subject,e.body)}
+async function markEmailSent(id){if(!requireAdmin())return;const e=state.emailQueue.find(x=>x.id===id);if(e){e.status='POSLATO';e.sentAt=new Date().toISOString();await saveState();await directUpsert('email',e)}}
+function removeQueued(id){if(!requireAdmin())return;state.emailQueue=state.emailQueue.filter(e=>e.id!==id);saveState()}
+
+function saveSettings(){if(!requireAdmin())return;state.settings.apiUrl=apiUrl.value.trim();state.settings.ownerEmail=ownerEmail.value.trim();state.settings.onboardingUrl=onboardingUrl.value.trim();state.settings.renewalUrl=renewalUrl.value.trim();state.settings.sampleUrl=sampleUrl.value.trim();saveState();showToast('Podešavanja su sačuvana')}
+function testGmail(){if(!ownerEmail.value.trim())return showToast('Unesi test email');openGmail({to:[ownerEmail.value.trim()],cc:[],bcc:[]},'LBD Boost Control Center — Gmail test','Ovo je test Gmail draft integracije.')}
+
+currentUser=loadAuthSession();
+if(currentUser){
+  applyAuthUI();document.getElementById('loginOverlay').classList.add('hidden');
+}else{
+  document.getElementById('loginOverlay').classList.remove('hidden');
+}
+state.leads=(state.leads||[]).map(normalizeLeadQualification);
+renderAll();
+prepareEmailCenter();
+if(currentUser&&(isAppsScriptHosted()||apiUrl()))loadStateFromDrive(false);
+</script>
 </body>
 </html>
