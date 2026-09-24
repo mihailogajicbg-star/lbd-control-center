@@ -3,7 +3,7 @@
 try{
   const k='lbd_boost_control_center_v13';
   const saved=JSON.parse(localStorage.getItem(k)||'{}');
-  saved.settings={...(saved.settings||{}),apiUrl:'https://script.google.com/macros/s/AKfycbyNgWWoYv9Hp1I2RlsKXAu4MTaIwfglPw5_nhN6lP_9V2ciujUis33d57y6fclGUcSv/exec'};
+  saved.settings={...(saved.settings||{}),apiUrl:'/api/backend'};
   localStorage.setItem(k,JSON.stringify(saved));
 }catch(e){}
 
